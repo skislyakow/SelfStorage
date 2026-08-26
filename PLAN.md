@@ -21,6 +21,7 @@
 | QR-коды | библиотека qrcode |
 | Онлайн-консультант | виджет Jivo, одна строка в шаблоне |
 | Демонстрационный запуск | сервер на Ubuntu (публичный адрес для уведомлений от платёжной системы, база SQLite, запуск по расписанию) |
+| Автодеплой | GitHub Actions на пуш в `main` → VPS `selftorage.kislyakov.pro` (порт 8003): `git pull`, `collectstatic`, `migrate`, `seed_demo`, restart gunicorn+nginx; демо-данные пересоздаются при каждом деплое |
 
 
 
