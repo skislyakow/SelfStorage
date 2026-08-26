@@ -17,6 +17,19 @@ class Warehouse(models.Model):
     def __str__(self):
         return f"{self.city}, {self.address}"
 
+    @property
+    def feature(self):
+        parts = []
+        if self.temperature:
+            parts.append(self.temperature)
+        if self.ceiling_height:
+            parts.append(f"потолки {self.ceiling_height} м")
+        if parts:
+            return "; ".join(parts)
+        if self.description:
+            return self.description[:60]
+        return "—"
+
 
 class Box(models.Model):
     STATUS_CHOICES = [
