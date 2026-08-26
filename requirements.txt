@@ -3,3 +3,4 @@ yookassa
 qrcode[pil]
 Pillow
 django-environ
+gunicorn
