@@ -51,3 +51,22 @@ class OwnerDashboardTests(TestCase):
         self.assertEqual(resp.status_code, 302)
         dr.refresh_from_db()
         self.assertEqual(dr.status, "done")
+
+    def test_delivery_add_requires_order(self):
+        admin = User.objects.get(email="admin@selfstorage.ru")
+        self.client.force_login(admin)
+        url = "/admin/rentals/deliveryrequest/add/"
+        resp = self.client.post(
+            url,
+            {
+                "client_address": "Москва, ул. Тестовая, д. 1",
+                "phone": "+7-900-000-00-00",
+                "status": "new",
+            },
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(
+            DeliveryRequest.objects.filter(
+                client_address="Москва, ул. Тестовая, д. 1"
+            ).exists()
+        )

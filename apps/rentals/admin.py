@@ -14,14 +14,15 @@ class DeliveryRequestAdmin(admin.ModelAdmin):
         "order_link",
         "warehouse",
         "box",
-        "client_address",
+        "client_address_link",
         "phone_link",
         "status",
         "rejection_reason_short",
     )
     list_filter = ("status",)
     search_fields = ("client_address", "phone", "order__user__email", "order__user__phone")
-    readonly_fields = ("order", "warehouse", "box", "client_address")
+    readonly_fields = ("warehouse", "box")
+    autocomplete_fields = ("order",)
     list_select_related = ("order__box__warehouse", "order__user")
 
     @admin.display(description="Заказ", ordering="order__pk")
@@ -38,7 +39,7 @@ class DeliveryRequestAdmin(admin.ModelAdmin):
         return obj.order.box.number
 
     @admin.display(description="Куда ехать")
-    def client_address(self, obj):
+    def client_address_link(self, obj):
         if not obj.client_address:
             return "—"
         link = f"https://yandex.ru/maps/?text={urlencode(obj.client_address)}"
