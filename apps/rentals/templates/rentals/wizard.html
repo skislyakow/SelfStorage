@@ -15,3 +15,21 @@
   </form>
 </div>
 {% endblock %}
+{% block scripts %}
+<script>
+  (function () {
+    function toggleAddress() {
+      var delivery = document.querySelector('input[name$="delivery_type"]:checked');
+      var addr = document.querySelector('input[name$="address"]');
+      if (!delivery || !addr) return;
+      var show = delivery.value !== "self";
+      addr.closest("p").style.display = show ? "" : "none";
+      addr.required = show;
+    }
+    document.addEventListener("change", function (e) {
+      if (e.target.name && e.target.name.endsWith("delivery_type")) toggleAddress();
+    });
+    document.addEventListener("DOMContentLoaded", toggleAddress);
+  })();
+</script>
+{% endblock %}
