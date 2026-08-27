@@ -68,7 +68,11 @@ class DeliveryRequest(models.Model):
         verbose_name="Заказ",
     )
     client_address = models.CharField(
-        "Адрес клиента", max_length=255, blank=True, default=""
+        "Адрес забора у клиента",
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Откуда курьер забирает вещи (адрес клиента)",
     )
     phone = models.CharField("Телефон", max_length=20, blank=True, default="")
     status = models.CharField(

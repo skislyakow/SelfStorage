@@ -49,7 +49,7 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
         user = cast(User, self.request.user)
         user.first_name = data.get("first_name", "")
         user.phone = data["phone"]
-        user.pd_consent_date = date.today()
+        user.pd_consent = bool(data.get("pd_consent", False))
         user.save()
 
         return redirect("warehouse_list")

@@ -65,7 +65,7 @@ class OrderWizardTests(TestCase):
         self.assertEqual(RentalOrder.objects.filter(user=self.user).count(), 1)
         self.user.refresh_from_db()
         self.assertEqual(self.user.first_name, "Имя")
-        self.assertTrue(self.user.pd_consent_date)
+        self.assertTrue(self.user.pd_consent)
 
     def test_wizard_self_pickup_no_delivery(self):
         self.client.login(email="wizard@test.ru", password="pass1234")

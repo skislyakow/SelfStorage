@@ -1,6 +1,6 @@
 import os
 import shutil
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from django.conf import settings
@@ -100,15 +100,21 @@ class Command(BaseCommand):
             email="ekatyusha89@yandex.ru",
             phone="+7-909-000-00-00",
             password="111111111",
-            pd_consent_date=date.today(),
+            pd_consent=True,
         )
         User.objects.create_superuser(email="admin@selfstorage.ru", password="admin12345")
 
-        promo = PromoCode.objects.create(
+        promo_storage15 = PromoCode.objects.create(
             code="storage15",
             discount_percent=15,
-            valid_from=date(2026, 1, 1),
-            valid_to=date(2026, 12, 31),
+            valid_from=date(2026, 11, 1),
+            valid_to=date(2027, 4, 30),
+        )
+        PromoCode.objects.create(
+            code="storage2022",
+            discount_percent=22,
+            valid_from=date(2026, 3, 1),
+            valid_to=date(2026, 3, 31),
         )
 
         # Две активные аренды Екатерины
@@ -116,7 +122,7 @@ class Command(BaseCommand):
             user=user, box=box_ekat1,
             start_date=date(2022, 3, 15), end_date=date(2022, 6, 28),
             items_text="Сезонные вещи: лыжи, сноуборд, коробки с книгами.",
-            status="active", promo=promo,
+            status="active", promo=promo_storage15,
             amount=box_ekat1.price_per_month * Decimal("0.85"),
             traffic_source="vk",
         )
@@ -137,5 +143,135 @@ class Command(BaseCommand):
             phone="+7-909-000-00-00",
             status="done",
         )
+
+        # Просроченный заказ — для обзвона владельцем
+        overdue_box = Box.objects.filter(warehouse=warehouses["Москва"]).first()
+        RentalOrder.objects.create(
+            user=user,
+            box=overdue_box,
+            start_date=date(2022, 1, 1),
+            end_date=date(2022, 5, 1),
+            items_text="Вещи просрочены, нужно напомнить о вывозе.",
+            status="overdue",
+            amount=overdue_box.price_per_month,
+            traffic_source="direct",
+        )
+
+        # Продлён на 6 мес (по техническому заданию — тоже требует звонка)
+        ext_box = Box.objects.filter(warehouse=warehouses["Пушкино"]).first()
+        RentalOrder.objects.create(
+            user=user,
+            box=ext_box,
+            start_date=date(2022, 1, 1),
+            end_date=date(2022, 4, 1),
+            items_text="Продлено на 6 мес, повышенный тариф.",
+            status="extended_6m",
+            amount=ext_box.price_per_month * Decimal("1.5"),
+            traffic_source="vk",
+        )
+
+        # Новая заявка на доставку — очередь к выполнению
+        new_box = (
+            Box.objects.filter(warehouse=odintsovo)
+            .exclude(pk=box_ekat1.pk)
+            .first()
+        )
+        new_order = RentalOrder.objects.create(
+            user=user,
+            box=new_box,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=90),
+            items_text="Новый заказ с доставкой.",
+            status="awaiting_payment",
+            amount=2500,
+            traffic_source="google",
+        )
+        DeliveryRequest.objects.create(
+            order=new_order,
+            client_address="Одинцово, ул. Победы, д. 10, кв. 5",
+            phone="+7-909-111-22-33",
+            status="new",
+        )
+
+        # Демо-клиенты для множества заявок на доставку (разные люди)
+        CLIENTS = [
+            ("ira@mail.ru", "+7-909-111-22-33"),
+            ("petr@mail.ru", "+7-916-222-33-44"),
+            ("sveta@mail.ru", "+7-985-333-44-55"),
+            ("anton@mail.ru", "+7-903-444-55-66"),
+            ("olga@mail.ru", "+7-912-555-66-77"),
+            ("dmitry@mail.ru", "+7-977-666-77-88"),
+            ("nik@mail.ru", "+7-905-777-11-22"),
+            ("maria@mail.ru", "+7-919-888-33-44"),
+            ("igor@mail.ru", "+7-903-999-55-66"),
+            ("anna@mail.ru", "+7-916-000-77-88"),
+            ("pavel@mail.ru", "+7-985-121-99-00"),
+            ("kara@mail.ru", "+7-977-323-44-55"),
+            ("roma@mail.ru", "+7-903-111-44-55"),
+            ("vika@mail.ru", "+7-916-222-55-66"),
+            ("timur@mail.ru", "+7-985-333-66-77"),
+            ("liza@mail.ru", "+7-909-444-77-88"),
+        ]
+        clients = {
+            email: User.objects.create_user(
+                email=email,
+                phone=phone,
+                password="111111111",
+                pd_consent=True,
+            )
+            for email, phone in CLIENTS
+        }
+
+        # Заявки на доставку с разными статусами, адресами и клиентами;
+        # отклонённые — с причиной (сценарий ТЗ: «не поместится» / «не прошли условия»)
+        DELIVERY_DEMO = [
+            ("new", "Москва, ул. Тверская, д. 20", ""),
+            ("in_progress", "Москва, ул. Ленина, д. 5, кв. 12", ""),
+            ("done", "Пушкино, ул. Лесная, д. 3", ""),
+            ("rejected", "Люберцы, ул. Мира, д. 8",
+             "Отказ принять на доставку: вещи не влезают в лифт, вынос на 5 этаж невозможен."),
+            ("rejected", "Домодедово, ул. Центральная, д. 14",
+             "Отказ принять на доставку: клиент не предоставил согласие на обработку персональных данных."),
+            ("new", "Одинцово, ул. Садовая, д. 2, кв. 30", ""),
+            ("in_progress", "Москва, ул. Арбат, д. 11, кв. 4", ""),
+            ("done", "Одинцово, ул. Школьная, д. 7", ""),
+            ("new", "Пушкино, ул. Заводская, д. 22", ""),
+            ("in_progress", "Люберцы, ул. Октября, д. 9, кв. 51", ""),
+            ("done", "Домодедово, ул. Парковая, д. 3", ""),
+            ("rejected", "Москва, ул. Профсоюзная, д. 44",
+             "Отказ принять на доставку: вещи в повреждённой упаковке, не допускаются к хранению."),
+            ("rejected", "Москва, ул. Лесная, д. 17, кв. 33",
+             "Отказ принять на доставку: адрес вне зоны бесплатной доставки."),
+            ("rejected", "Одинцово, ул. Центральная, д. 4",
+             "Отказ принять на доставку: обнаружены запрещённые вещи по правилам хранения."),
+            ("rejected", "Пушкино, ул. Советская, д. 9",
+             "Отказ принять на доставку: превышен допустимый вес и объём партии."),
+            ("rejected", "Люберцы, ул. Победы, д. 2, кв. 14",
+             "Отказ принять на доставку: клиент не оплатил заказ, бронь истекла."),
+        ]
+        wh_list = list(warehouses.values())
+        emails = list(clients.keys())
+        for i, (status, address, reason) in enumerate(DELIVERY_DEMO):
+            wh = wh_list[i % len(wh_list)]
+            demo_box = (
+                Box.objects.filter(warehouse=wh).exclude(pk=box_ekat1.pk).first()
+            )
+            demo_order = RentalOrder.objects.create(
+                user=clients[emails[i]],
+                box=demo_box,
+                start_date=date.today(),
+                end_date=date.today() + timedelta(days=90),
+                items_text="Демо-заказ с доставкой.",
+                status="awaiting_payment",
+                amount=demo_box.price_per_month,
+                traffic_source="demo",
+            )
+            DeliveryRequest.objects.create(
+                order=demo_order,
+                client_address=address,
+                phone=clients[emails[i]].phone,
+                status=status,
+                rejection_reason=reason,
+            )
 
         self.stdout.write(self.style.SUCCESS("Демо-данные обновлены (idempotent, гибрид + фото)."))
