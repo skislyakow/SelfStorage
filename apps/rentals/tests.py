@@ -40,7 +40,6 @@ class OrderWizardTests(TestCase):
             {
                 "1-delivery_type": "delivery",
                 "1-address": "ул. Тест",
-                "1-phone": "79990000000",
             },
             r,
         )
@@ -71,7 +70,7 @@ class OrderWizardTests(TestCase):
             {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
         )
         r = self._post_step(
-            {"1-delivery_type": "self", "1-phone": "79990000000"}, r
+            {"1-delivery_type": "self"}, r
         )
         r = self._post_step(
             {

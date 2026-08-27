@@ -25,7 +25,6 @@ class DeliveryForm(forms.Form):
         choices=DELIVERY_TYPES, widget=forms.RadioSelect, label="Способ получения"
     )
     address = forms.CharField(required=False, label="Адрес доставки")
-    phone = forms.CharField(label="Телефон")
 
 
 class ContactsForm(forms.Form):
