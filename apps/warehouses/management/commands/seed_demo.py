@@ -104,11 +104,17 @@ class Command(BaseCommand):
         )
         User.objects.create_superuser(email="admin@selfstorage.ru", password="admin12345")
 
-        promo = PromoCode.objects.create(
+        promo_storage15 = PromoCode.objects.create(
             code="storage15",
             discount_percent=15,
-            valid_from=date(2026, 1, 1),
-            valid_to=date(2026, 12, 31),
+            valid_from=date(2026, 11, 1),
+            valid_to=date(2027, 4, 30),
+        )
+        PromoCode.objects.create(
+            code="storage2022",
+            discount_percent=22,
+            valid_from=date(2026, 3, 1),
+            valid_to=date(2026, 3, 31),
         )
 
         # Две активные аренды Екатерины
@@ -116,7 +122,7 @@ class Command(BaseCommand):
             user=user, box=box_ekat1,
             start_date=date(2022, 3, 15), end_date=date(2022, 6, 28),
             items_text="Сезонные вещи: лыжи, сноуборд, коробки с книгами.",
-            status="active", promo=promo,
+            status="active", promo=promo_storage15,
             amount=box_ekat1.price_per_month * Decimal("0.85"),
             traffic_source="vk",
         )
