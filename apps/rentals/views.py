@@ -1,5 +1,6 @@
 from calendar import monthrange
 from datetime import date
+from typing import cast
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
@@ -7,6 +8,7 @@ from formtools.wizard.views import SessionWizardView
 
 from apps.rentals.forms import BoxForm, ContactsForm, DeliveryForm, SummaryForm
 from apps.rentals.models import DeliveryRequest, RentalOrder
+from apps.users.models import User
 
 
 def add_months(start, months):
@@ -44,7 +46,7 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
                 status="new",
             )
 
-        user = self.request.user
+        user = cast(User, self.request.user)
         user.first_name = data.get("first_name", "")
         user.phone = data["phone"]
         user.pd_consent_date = date.today()

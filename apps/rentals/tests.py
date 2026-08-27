@@ -1,22 +1,26 @@
 import re
 
-from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
 
 from apps.rentals.models import DeliveryRequest, RentalOrder
 from apps.warehouses.models import Box, Warehouse
-
-User = get_user_model()
+from apps.users.models import User
 
 
 class OrderWizardTests(TestCase):
     def setUp(self):
         wh = Warehouse.objects.create(city="Тест", address="ул. Тест, 1")
         self.box = Box.objects.create(
-            warehouse=wh, number="1", area=5, price_per_month=3000, status="free"
+            warehouse=wh,
+            number="1",
+            area=5,
+            price_per_month=3000,
+            status="free",
         )
-        self.user = User.objects.create_user(email="wizard@test.ru", password="pass1234")
+        self.user = User(email="wizard@test.ru")
+        self.user.set_password("pass1234")
+        self.user.save()
         self.client = Client(SERVER_NAME="localhost")
 
     def _management(self, html):
@@ -54,11 +58,11 @@ class OrderWizardTests(TestCase):
         r = self._post_step({}, r)
 
         self.assertEqual(RentalOrder.objects.count(), 1)
-        order = RentalOrder.objects.first()
+        order = RentalOrder.objects.get()
         self.assertEqual(order.amount, self.box.price_per_month * 3)
         self.assertEqual(order.status, "awaiting_payment")
         self.assertEqual(DeliveryRequest.objects.count(), 1)
-        self.assertEqual(self.user.orders.count(), 1)
+        self.assertEqual(RentalOrder.objects.filter(user=self.user).count(), 1)
         self.user.refresh_from_db()
         self.assertEqual(self.user.first_name, "Имя")
         self.assertTrue(self.user.pd_consent_date)
@@ -69,9 +73,7 @@ class OrderWizardTests(TestCase):
         r = self._post_step(
             {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
         )
-        r = self._post_step(
-            {"1-delivery_type": "self"}, r
-        )
+        r = self._post_step({"1-delivery_type": "self"}, r)
         r = self._post_step(
             {
                 "2-first_name": "Имя",

@@ -17,12 +17,16 @@ DELIVERY_TYPES = [
 
 class BoxForm(forms.Form):
     box = forms.ModelChoiceField(queryset=Box.objects.all(), label="Бокс")
-    rental_months = forms.ChoiceField(choices=MONTHS, initial=1, label="Срок аренды, мес.")
+    rental_months = forms.ChoiceField(
+        choices=MONTHS, initial=1, label="Срок аренды, мес."
+    )
 
 
 class DeliveryForm(forms.Form):
     delivery_type = forms.ChoiceField(
-        choices=DELIVERY_TYPES, widget=forms.RadioSelect, label="Способ получения"
+        choices=DELIVERY_TYPES,
+        widget=forms.RadioSelect,
+        label="Способ получения",
     )
     address = forms.CharField(required=False, label="Адрес доставки")
 
@@ -30,7 +34,9 @@ class DeliveryForm(forms.Form):
 class ContactsForm(forms.Form):
     first_name = forms.CharField(label="Имя")
     phone = forms.CharField(label="Телефон")
-    pd_consent = forms.BooleanField(label="Согласие на обработку персональных данных")
+    pd_consent = forms.BooleanField(
+        label="Согласие на обработку персональных данных"
+    )
 
 
 class SummaryForm(forms.Form):
