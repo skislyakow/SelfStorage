@@ -11,7 +11,7 @@ DELIVERY_ACTIVE_STATUSES = ("new", "in_progress")
 
 
 @staff_member_required
-def owner_dashboard(request):
+def owner_dashboard(request, *args, **kwargs):
     deliveries = (
         DeliveryRequest.objects.filter(status__in=DELIVERY_ACTIVE_STATUSES)
         .select_related("order__user", "order__box__warehouse")
@@ -37,3 +37,7 @@ def owner_dashboard(request):
         overdue_count=overdue.count(),
     )
     return TemplateResponse(request, "admin/owner_dashboard.html", context)
+
+
+# Сделать «Панель владельца» главной страницей админки (вход по /admin/)
+admin.site.index = owner_dashboard  # type: ignore[method-assign]
