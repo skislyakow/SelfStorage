@@ -14,7 +14,7 @@ def register(request):
             user.save(update_fields=["pd_consent_date"])
             login(request, user)
             messages.success(request, 'Регистрация прошла успешно!')
-            return redirect('warehouse_list')
+            return redirect('home')
     else:
         form = CustomUserCreationForm()
 

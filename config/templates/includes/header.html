@@ -36,6 +36,9 @@
 						<span class="SelfStorage_green">{{ user.first_name|default:user.email }}</span>
 					</a>
 				</li>
+				<li class="nav-item me-5">
+					<a class="nav-link SelfStorage_green" href="{% url 'users:logout' %}">Выйти</a>
+				</li>
 				{% else %}
 				<li class="nav-item me-5">
 					<a class="nav-link SelfStorage_green" href="#" data-bs-toggle="modal" data-bs-target="#SignModal">Войти</a>
