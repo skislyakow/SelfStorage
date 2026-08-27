@@ -30,7 +30,7 @@ class DeliveryRequestAdmin(admin.ModelAdmin):
         url = reverse("admin:rentals_rentalorder_change", args=[obj.order_id])
         return format_html('<a href="{}">#{}</a>', url, obj.order_id)
 
-    @admin.display(description="Склад (откуда)")
+    @admin.display(description="Склад (куда привезти)")
     def warehouse(self, obj):
         return obj.order.box.warehouse
 
@@ -38,7 +38,7 @@ class DeliveryRequestAdmin(admin.ModelAdmin):
     def box(self, obj):
         return obj.order.box.number
 
-    @admin.display(description="Куда ехать")
+    @admin.display(description="Адрес забора (у клиента)")
     def client_address_link(self, obj):
         if not obj.client_address:
             return "—"
