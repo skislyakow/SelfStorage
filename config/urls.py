@@ -9,4 +9,5 @@ urlpatterns = [
     path("storage-rules/", views.StorageRulesView.as_view(), name="storage_rules"),
     path("warehouses/", include("apps.warehouses.urls")),
     path("orders/", include("apps.rentals.urls")),
+    path("accounts/", include("apps.users.urls")),
 ]
