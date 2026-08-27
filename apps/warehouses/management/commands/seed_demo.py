@@ -100,7 +100,7 @@ class Command(BaseCommand):
             email="ekatyusha89@yandex.ru",
             phone="+7-909-000-00-00",
             password="111111111",
-            pd_consent_date=date.today(),
+            pd_consent=True,
         )
         User.objects.create_superuser(email="admin@selfstorage.ru", password="admin12345")
 
@@ -217,7 +217,7 @@ class Command(BaseCommand):
                 email=email,
                 phone=phone,
                 password="111111111",
-                pd_consent_date=date.today(),
+                pd_consent=True,
             )
             for email, phone in CLIENTS
         }

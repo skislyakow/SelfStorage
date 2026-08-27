@@ -1,5 +1,3 @@
-from datetime import date
-
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib import messages
@@ -10,8 +8,8 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            user.pd_consent_date = date.today()
-            user.save(update_fields=["pd_consent_date"])
+            user.pd_consent = True
+            user.save(update_fields=["pd_consent"])
             login(request, user)
             messages.success(request, 'Регистрация прошла успешно!')
             return redirect('warehouse_list')

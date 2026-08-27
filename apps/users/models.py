@@ -30,7 +30,7 @@ class User(AbstractUser):
     username = None
     email = models.EmailField("Email", unique=True)
     phone = models.CharField("Телефон", max_length=20, blank=True, default="")
-    pd_consent_date = models.DateField("Дата согласия на обработку ПД", null=True, blank=True)
+    pd_consent = models.BooleanField("Согласие на обработку ПД", default=False)
 
     objects = UserManager()
     USERNAME_FIELD = "email"

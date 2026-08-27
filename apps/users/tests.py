@@ -25,4 +25,22 @@ class RegistrationTests(TestCase):
         self.assertEqual(response["Location"], reverse("warehouse_list"))
         user = User.objects.get(email="new@test.ru")
         self.assertTrue(user.check_password("Str0ngPass!123"))
-        self.assertIsNotNone(user.pd_consent_date)
+        self.assertTrue(user.pd_consent)
+
+
+class UserAdminTests(TestCase):
+    def test_user_admin_list_and_change_minimal(self):
+        User.objects.create_superuser(email="admin@test.ru", password="x1!aaaaA2")
+        self.client.login(email="admin@test.ru", password="x1!aaaaA2")
+
+        list_resp = self.client.get("/admin/users/user/")
+        self.assertEqual(list_resp.status_code, 200)
+        self.assertContains(list_resp, "Телефон")
+
+        user = User.objects.create_user(email="someone@test.ru", phone="+79990000000")
+        change_resp = self.client.get(f"/admin/users/user/{user.pk}/change/")
+        self.assertEqual(change_resp.status_code, 200)
+        self.assertContains(change_resp, "Согласие ПД")
+        self.assertNotContains(change_resp, 'id="id_groups"')
+        self.assertNotContains(change_resp, 'id="id_user_permissions"')
+        self.assertNotContains(change_resp, "Важные даты")
