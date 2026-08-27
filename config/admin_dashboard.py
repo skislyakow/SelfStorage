@@ -23,6 +23,12 @@ def owner_dashboard(request, *args, **kwargs):
         .order_by("end_date")
     )
 
+    rejected = (
+        DeliveryRequest.objects.filter(status="rejected")
+        .select_related("order__user", "order__box__warehouse")
+        .order_by("pk")
+    )
+
     today = date.today()
     overdue_rows = [
         {"order": order, "days": (today - order.end_date).days} for order in overdue
@@ -33,8 +39,10 @@ def owner_dashboard(request, *args, **kwargs):
         title="Панель владельца",
         deliveries=deliveries,
         overdue=overdue_rows,
+        rejected=rejected,
         deliveries_count=deliveries.count(),
         overdue_count=overdue.count(),
+        rejected_count=rejected.count(),
     )
     return TemplateResponse(request, "admin/owner_dashboard.html", context)
 

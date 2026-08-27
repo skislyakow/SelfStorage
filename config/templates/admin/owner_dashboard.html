@@ -27,6 +27,7 @@
   <div class="owner-cards">
     <div class="owner-card">Доставок к выполнению<b>{{ deliveries_count }}</b></div>
     <div class="owner-card">Просроченных — позвонить<b>{{ overdue_count }}</b></div>
+    <div class="owner-card">Отклонено доставчиком<b>{{ rejected_count }}</b></div>
   </div>
 
   <h2>Доставки к выполнению</h2>
@@ -40,6 +41,7 @@
         <th>Куда ехать</th>
         <th>Телефон</th>
         <th>Статус</th>
+        <th>Причина отказа</th>
         <th></th>
       </tr>
     </thead>
@@ -56,6 +58,7 @@
         </td>
         <td>{% if d.phone %}<a href="tel:{{ d.phone }}">{{ d.phone }}</a>{% else %}<span class="muted">—</span>{% endif %}</td>
         <td><span class="pill">{{ d.get_status_display }}</span></td>
+        <td>{% if d.status == "rejected" %}{{ d.rejection_reason }}{% else %}<span class="muted">—</span>{% endif %}</td>
         <td><a href="{% url 'admin:rentals_deliveryrequest_change' d.pk %}">Открыть</a></td>
       </tr>
       {% endfor %}
@@ -64,6 +67,42 @@
   <p><a href="{% url 'admin:rentals_deliveryrequest_changelist' %}?status__exact=new">Все новые заявки в админке →</a></p>
   {% else %}
   <p class="muted">Нет заявок к выполнению.</p>
+  {% endif %}
+
+  <h2>Отклонённые доставки</h2>
+  {% if rejected %}
+  <table class="owner-table">
+    <thead>
+      <tr>
+        <th>Заказ</th>
+        <th>Склад (откуда забрать)</th>
+        <th>Бокс</th>
+        <th>Куда ехать</th>
+        <th>Телефон</th>
+        <th>Причина отказа</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in rejected %}
+      <tr>
+        <td><a href="{% url 'admin:rentals_rentalorder_change' d.order_id %}">#{{ d.order_id }}</a></td>
+        <td>{{ d.order.box.warehouse }}</td>
+        <td>{{ d.order.box.number }}</td>
+        <td>
+          {% if d.client_address %}
+          <a href="https://yandex.ru/maps/?text={{ d.client_address|urlencode }}" target="_blank">{{ d.client_address }}</a>
+          {% else %}<span class="muted">—</span>{% endif %}
+        </td>
+        <td>{% if d.phone %}<a href="tel:{{ d.phone }}">{{ d.phone }}</a>{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td>{{ d.rejection_reason }}</td>
+        <td><a href="{% url 'admin:rentals_deliveryrequest_change' d.pk %}">Открыть</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">Нет отклонённых заявок.</p>
   {% endif %}
 
   <h2>Просроченные — позвонить</h2>

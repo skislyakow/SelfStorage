@@ -187,4 +187,73 @@ class Command(BaseCommand):
             status="new",
         )
 
+        # Демо-клиенты для множества заявок на доставку (разные люди)
+        CLIENTS = [
+            ("ira@mail.ru", "+7-909-111-22-33"),
+            ("petr@mail.ru", "+7-916-222-33-44"),
+            ("sveta@mail.ru", "+7-985-333-44-55"),
+            ("anton@mail.ru", "+7-903-444-55-66"),
+            ("olga@mail.ru", "+7-912-555-66-77"),
+            ("dmitry@mail.ru", "+7-977-666-77-88"),
+            ("nik@mail.ru", "+7-905-777-11-22"),
+            ("maria@mail.ru", "+7-919-888-33-44"),
+            ("igor@mail.ru", "+7-903-999-55-66"),
+            ("anna@mail.ru", "+7-916-000-77-88"),
+            ("pavel@mail.ru", "+7-985-121-99-00"),
+            ("kara@mail.ru", "+7-977-323-44-55"),
+        ]
+        clients = {
+            email: User.objects.create_user(
+                email=email,
+                phone=phone,
+                password="111111111",
+                pd_consent_date=date.today(),
+            )
+            for email, phone in CLIENTS
+        }
+
+        # Заявки на доставку с разными статусами, адресами и клиентами;
+        # отклонённые — с причиной (сценарий ТЗ: «не поместится» / «не прошли условия»)
+        DELIVERY_DEMO = [
+            ("new", "Москва, ул. Тверская, д. 20", ""),
+            ("in_progress", "Москва, ул. Ленина, д. 5, кв. 12", ""),
+            ("done", "Пушкино, ул. Лесная, д. 3", ""),
+            ("rejected", "Люберцы, ул. Мира, д. 8",
+             "Вещи не поместились в лифт, выгрузка на 5 этаж невозможна."),
+            ("rejected", "Домодедово, ул. Центральная, д. 14",
+             "Клиент не подписал согласие на обработку ПД — отказ."),
+            ("new", "Одинцово, ул. Садовая, д. 2, кв. 30", ""),
+            ("in_progress", "Москва, ул. Арбат, д. 11, кв. 4", ""),
+            ("done", "Одинцово, ул. Школьная, д. 7", ""),
+            ("new", "Пушкино, ул. Заводская, д. 22", ""),
+            ("in_progress", "Люберцы, ул. Октября, д. 9, кв. 51", ""),
+            ("done", "Домодедово, ул. Парковая, д. 3", ""),
+            ("rejected", "Москва, ул. Профсоюзная, д. 44",
+             "Повреждена упаковка, клиент отказался принимать."),
+        ]
+        wh_list = list(warehouses.values())
+        emails = list(clients.keys())
+        for i, (status, address, reason) in enumerate(DELIVERY_DEMO):
+            wh = wh_list[i % len(wh_list)]
+            demo_box = (
+                Box.objects.filter(warehouse=wh).exclude(pk=box_ekat1.pk).first()
+            )
+            demo_order = RentalOrder.objects.create(
+                user=clients[emails[i]],
+                box=demo_box,
+                start_date=date.today(),
+                end_date=date.today() + timedelta(days=90),
+                items_text="Демо-заказ с доставкой.",
+                status="awaiting_payment",
+                amount=demo_box.price_per_month,
+                traffic_source="demo",
+            )
+            DeliveryRequest.objects.create(
+                order=demo_order,
+                client_address=address,
+                phone=clients[emails[i]].phone,
+                status=status,
+                rejection_reason=reason,
+            )
+
         self.stdout.write(self.style.SUCCESS("Демо-данные обновлены (idempotent, гибрид + фото)."))
