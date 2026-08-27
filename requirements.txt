@@ -3,4 +3,5 @@ yookassa
 qrcode[pil]
 Pillow
 django-environ
+django-formtools==2.7
 gunicorn

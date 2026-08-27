@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ru">
+<body>
+<h1>Мастер заказа — шаг {{ wizard.steps.step1 }} / {{ wizard.steps.count }}</h1>
+<form method="post">{% csrf_token %}
+  {{ wizard.management_form }}
+  {{ wizard.form.as_p }}
+  {% if wizard.steps.prev %}
+    <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">Назад</button>
+  {% endif %}
+  <button type="submit">{% if wizard.steps.current == wizard.steps.last %}Оформить заказ{% else %}Далее{% endif %}</button>
+</form>
+</body>
+</html>
