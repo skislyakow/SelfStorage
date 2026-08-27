@@ -36,3 +36,10 @@ class RegistrationTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response["Location"], reverse("home"))
         self.assertIn("_auth_user_id", self.client.session)
+
+    def test_logout_clears_session(self):
+        User.objects.create_user(email="logout@test.ru", password="Str0ngPass!123")
+        self.client.force_login(User.objects.get(email="logout@test.ru"))
+        response = self.client.post(reverse("users:logout"))
+        self.assertEqual(response.status_code, 302)
+        self.assertNotIn("_auth_user_id", self.client.session)
