@@ -1,6 +1,6 @@
 import os
 import shutil
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from django.conf import settings
@@ -136,6 +136,55 @@ class Command(BaseCommand):
             client_address="Одинцово, ул. Северная, д. 36",
             phone="+7-909-000-00-00",
             status="done",
+        )
+
+        # Просроченный заказ — для обзвона владельцем
+        overdue_box = Box.objects.filter(warehouse=warehouses["Москва"]).first()
+        RentalOrder.objects.create(
+            user=user,
+            box=overdue_box,
+            start_date=date(2022, 1, 1),
+            end_date=date(2022, 5, 1),
+            items_text="Вещи просрочены, нужно напомнить о вывозе.",
+            status="overdue",
+            amount=overdue_box.price_per_month,
+            traffic_source="direct",
+        )
+
+        # Продлён на 6 мес (по техническому заданию — тоже требует звонка)
+        ext_box = Box.objects.filter(warehouse=warehouses["Пушкино"]).first()
+        RentalOrder.objects.create(
+            user=user,
+            box=ext_box,
+            start_date=date(2022, 1, 1),
+            end_date=date(2022, 4, 1),
+            items_text="Продлено на 6 мес, повышенный тариф.",
+            status="extended_6m",
+            amount=ext_box.price_per_month * Decimal("1.5"),
+            traffic_source="vk",
+        )
+
+        # Новая заявка на доставку — очередь к выполнению
+        new_box = (
+            Box.objects.filter(warehouse=odintsovo)
+            .exclude(pk=box_ekat1.pk)
+            .first()
+        )
+        new_order = RentalOrder.objects.create(
+            user=user,
+            box=new_box,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=90),
+            items_text="Новый заказ с доставкой.",
+            status="awaiting_payment",
+            amount=2500,
+            traffic_source="google",
+        )
+        DeliveryRequest.objects.create(
+            order=new_order,
+            client_address="Одинцово, ул. Победы, д. 10, кв. 5",
+            phone="+7-909-111-22-33",
+            status="new",
         )
 
         self.stdout.write(self.style.SUCCESS("Демо-данные обновлены (idempotent, гибрид + фото)."))

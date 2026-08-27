@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.urls import include, path
 from config import views
+from config.admin_dashboard import owner_dashboard
 
 urlpatterns = [
+    path("admin/owner-dashboard/", owner_dashboard, name="owner-dashboard"),
     path("admin/", admin.site.urls),
     path("", views.HomeView.as_view(), name="home"),
     path("faq/", views.FaqView.as_view(), name="faq"),
