@@ -7,7 +7,7 @@
     {{ wizard.management_form }}
     {{ wizard.form.as_p }}
     {% if wizard.steps.prev %}
-      <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" class="btn btn-secondary">Назад</button>
+      <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" class="btn btn-secondary" formnovalidate>Назад</button>
     {% endif %}
     <button type="submit" class="btn btn-primary">
       {% if wizard.steps.next %}Далее{% else %}Оформить{% endif %}
