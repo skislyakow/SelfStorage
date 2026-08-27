@@ -22,7 +22,7 @@ class RegistrationTests(TestCase):
         }
         response = self.client.post(reverse("users:register"), data)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response["Location"], reverse("warehouse_list"))
+        self.assertEqual(response["Location"], reverse("home"))
         user = User.objects.get(email="new@test.ru")
         self.assertTrue(user.check_password("Str0ngPass!123"))
         self.assertTrue(user.pd_consent)
@@ -44,3 +44,22 @@ class UserAdminTests(TestCase):
         self.assertNotContains(change_resp, 'id="id_groups"')
         self.assertNotContains(change_resp, 'id="id_user_permissions"')
         self.assertNotContains(change_resp, "Важные даты")
+
+
+class LoginLogoutTests(TestCase):
+    def test_login_logs_in_user(self):
+        User.objects.create_user(email="login@test.ru", password="Str0ngPass!123")
+        response = self.client.post(reverse("users:login"), {
+            "username": "login@test.ru",
+            "password": "Str0ngPass!123",
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], reverse("home"))
+        self.assertIn("_auth_user_id", self.client.session)
+
+    def test_logout_clears_session(self):
+        User.objects.create_user(email="logout@test.ru", password="Str0ngPass!123")
+        self.client.force_login(User.objects.get(email="logout@test.ru"))
+        response = self.client.post(reverse("users:logout"))
+        self.assertEqual(response.status_code, 302)
+        self.assertNotIn("_auth_user_id", self.client.session)

@@ -1,59 +1,63 @@
 <aside class="modal fade" id="RegModal" tabindex="-1" aria-labelledby="RegModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
-		<div class="modal-content">
-			<div class="modal-header border-0">
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body d-flex justify-content-center align-items-center">
-				<form class="d-flex flex-column align-items-center" style="max-width: 420px" method="post" action="#">
-					{% csrf_token %}
-					<h1 class="modal-title text-center fw-bold mb-3" id="RegModalLabel">Регистрация</h1>
-					<input type="email" required name="email" class="form-control border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="E-mail">
-					<input type="password" required name="password1" class="form-control border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Пароль">
-					<input type="password" required name="password2" class="form-control border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Подтверждение пароля">
-					<span class="fw-light SelfStorage_grey">Нажимая на кнопку, вы подтверждаете свое <a href="#" class="SelfStorage_grey">согласие на обработку персональных данных</a></span>
-					<button type="submit" class="btn border-8 py-3 px-5 mt-5 mb-3 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange">Зарегистрироваться</button>
-					<span>Уже зарегистрированы? <a href="#" class="SelfStorage_orange" data-bs-toggle="modal" data-bs-target="#SignModal" data-bs-dismiss="modal" aria-label="Close">Войти в личный кабинет</a></span>
-				</form>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex justify-content-center align-items-center">
+                <form class="d-flex flex-column align-items-center" style="max-width: 420px" method="post" action="{% url 'users:register' %}">
+                    {% csrf_token %}
+                    <h1 class="modal-title text-center fw-bold mb-3" id="RegModalLabel">Регистрация</h1>
+                    <input type="email" required name="email" class="form-control border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="E-mail">
+                    <input type="tel" name="phone" class="form-control border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Телефон">
+                    <input type="password" required name="password1" class="form-control border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Пароль">
+                    <input type="password" required name="password2" class="form-control border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Подтверждение пароля">
+                    <div class="form-check mb-4">
+                        <input type="checkbox" name="personal_data_consent" required class="form-check-input" id="personalDataConsent">
+                        <label class="form-check-label fw-light SelfStorage_grey" for="personalDataConsent">Нажимая на кнопку, вы подтверждаете своё <a href="#" class="SelfStorage_grey">согласие на обработку персональных данных</a></label>
+                    </div>
+                    <button type="submit" class="btn border-8 py-3 px-5 mt-5 mb-3 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange">Зарегистрироваться</button>
+                    <span>Уже зарегистрированы? <a href="#" class="SelfStorage_orange" data-bs-toggle="modal" data-bs-target="#SignModal" data-bs-dismiss="modal" aria-label="Close">Войти в личный кабинет</a></span>
+                </form>
+            </div>
+        </div>
+    </div>
 </aside>
 <aside class="modal fade" id="SignModal" tabindex="-1" aria-labelledby="SignModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
-		<div class="modal-content">
-			<div class="modal-header border-0">
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body d-flex justify-content-center align-items-center">
-				<form class="d-flex flex-column align-items-center" style="max-width: 420px" method="post" action="#">
-					{% csrf_token %}
-					<h1 class="modal-title text-center fw-bold mb-3" id="SignModalLabel">Вход</h1>
-					<input type="email" required name="email" class="form-control  border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="E-mail">
-					<input type="password" required name="password" class="form-control  border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Пароль">
-					<a href="#" class="SelfStorage_orange" data-bs-toggle="modal" data-bs-target="#ForgetModal" data-bs-dismiss="modal" aria-label="Close">Забыли пароль?</a>
-					<button type="submit" class="btn border-8 py-3 px-5 mt-5 mb-3 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange">Войти</button>
-					<span>Нет аккаунта?  <a href="#" class="SelfStorage_orange" data-bs-toggle="modal" data-bs-target="#RegModal" data-bs-dismiss="modal" aria-label="Close">Зарегистрируйтесь на сайте</a></span>
-				</form>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex justify-content-center align-items-center">
+                <form class="d-flex flex-column align-items-center" style="max-width: 420px" method="post" action="{% url 'users:login' %}">
+                    {% csrf_token %}
+                    <h1 class="modal-title text-center fw-bold mb-3" id="SignModalLabel">Вход</h1>
+                    <input type="email" required name="username" class="form-control  border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="E-mail">
+                    <input type="password" required name="password" class="form-control  border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Пароль">
+                    <a href="#" class="SelfStorage_orange" data-bs-toggle="modal" data-bs-target="#ForgetModal" data-bs-dismiss="modal" aria-label="Close">Забыли пароль?</a>
+                    <button type="submit" class="btn border-8 py-3 px-5 mt-5 mb-3 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange">Войти</button>
+                    <span>Нет аккаунта?  <a href="#" class="SelfStorage_orange" data-bs-toggle="modal" data-bs-target="#RegModal" data-bs-dismiss="modal" aria-label="Close">Зарегистрируйтесь на сайте</a></span>
+                </form>
+            </div>
+        </div>
+    </div>
 </aside>
 <aside class="modal fade" id="ForgetModal" tabindex="-1" aria-labelledby="ForgetModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
-		<div class="modal-content">
-			<div class="modal-header border-0">
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body d-flex justify-content-center align-items-center">
-				<form class="d-flex flex-column align-items-center" style="max-width: 420px" method="post" action="#">
-					{% csrf_token %}
-					<h1 class="modal-title text-center fw-bold mb-3" id="ForgetModalLabel">Восстановление пароля</h1>
-					<input type="email" required name="email" class="form-control  border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="E-mail">
-					<button type="submit" class="btn border-8 py-3 px-5 mt-5 mb-3 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange">Восстановить</button>
-					<span>Вспомнили пароль?  <a href="#" class="SelfStorage_orange" data-bs-toggle="modal" data-bs-target="#SignModal" data-bs-dismiss="modal" aria-label="Close">Отмена</a></span>
-				</form>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex justify-content-center align-items-center">
+                <form class="d-flex flex-column align-items-center" style="max-width: 420px" method="post" action="#">
+                    {% csrf_token %}
+                    <h1 class="modal-title text-center fw-bold mb-3" id="ForgetModalLabel">Восстановление пароля</h1>
+                    <input type="email" required name="email" class="form-control  border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="E-mail">
+                    <button type="submit" class="btn border-8 py-3 px-5 mt-5 mb-3 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange">Восстановить</button>
+                    <span>Вспомнили пароль?  <a href="#" class="SelfStorage_orange" data-bs-toggle="modal" data-bs-target="#SignModal" data-bs-dismiss="modal" aria-label="Close">Отмена</a></span>
+                </form>
+            </div>
+        </div>
+    </div>
 </aside>

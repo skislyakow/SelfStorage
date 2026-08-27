@@ -36,6 +36,12 @@
 						<span class="SelfStorage_green">{{ user.first_name|default:user.email }}</span>
 					</a>
 				</li>
+				<li class="nav-item me-5">
+					<form method="post" action="{% url 'users:logout' %}" class="d-inline">
+						{% csrf_token %}
+						<button type="submit" class="nav-link SelfStorage_green border-0 bg-transparent p-0">Выйти</button>
+					</form>
+				</li>
 				{% else %}
 				<li class="nav-item me-5">
 					<a class="nav-link SelfStorage_green" href="#" data-bs-toggle="modal" data-bs-target="#SignModal">Войти</a>
