@@ -35,3 +35,12 @@ class BoxAdminTests(TestCase):
         self.assertEqual(s22.discount_percent, 22)
         self.assertEqual(s22.valid_from, date(2026, 3, 1))
         self.assertEqual(s22.valid_to, date(2026, 3, 31))
+
+    def test_seed_sets_first_names(self):
+        ekat = User.objects.get(email="ekatyusha89@yandex.ru")
+        self.assertEqual(ekat.first_name, "Екатерина")
+        admin = User.objects.get(email="admin@selfstorage.ru")
+        self.assertEqual(admin.first_name, "Администратор")
+        ira = User.objects.get(email="ira@mail.ru")
+        self.assertEqual(ira.first_name, "Ира")
+        self.assertEqual(User.objects.exclude(first_name="").count(), User.objects.count())

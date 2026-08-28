@@ -3,6 +3,7 @@
 {% block content %}
 <div class="container py-5 text-center">
   <h1 class="mb-4">Бокс забронирован!</h1>
+  {% if order.user.first_name %}<p class="fs-5">Спасибо, {{ order.user.first_name }}!</p>{% endif %}
   <p class="fs-5">Склад: {{ order.box.warehouse.city }}, {{ order.box.warehouse.address }}</p>
   <p class="fs-5">Бокс №{{ order.box.number }} ({{ order.box.area }} м²)</p>
   <p class="fs-5">Срок: с {{ order.start_date|date:"d.m.Y" }} по {{ order.end_date|date:"d.m.Y" }}</p>

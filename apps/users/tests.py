@@ -18,6 +18,7 @@ class RegistrationTests(TestCase):
     def test_register_creates_user_and_redirects(self):
         data = {
             "email": "new@test.ru",
+            "first_name": "Новый",
             "phone": "+79990000000",
             "password1": "Str0ngPass!123",
             "password2": "Str0ngPass!123",
@@ -29,11 +30,13 @@ class RegistrationTests(TestCase):
         user = User.objects.get(email="new@test.ru")
         self.assertTrue(user.check_password("Str0ngPass!123"))
         self.assertTrue(user.pd_consent)
+        self.assertEqual(user.first_name, "Новый")
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_register_sends_welcome_email(self):
         data = {
             "email": "welcome@test.ru",
+            "first_name": "Привет",
             "phone": "+79990000000",
             "password1": "Str0ngPass!123",
             "password2": "Str0ngPass!123",
@@ -44,6 +47,9 @@ class RegistrationTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ["welcome@test.ru"])
         self.assertIn("Добро пожаловать", mail.outbox[0].subject)
+        self.assertEqual(
+            User.objects.get(email="welcome@test.ru").first_name, "Привет"
+        )
 
 
 class UserAdminTests(TestCase):
