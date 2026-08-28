@@ -6,7 +6,7 @@ class CustomUserCreationForm(UserCreationForm):
     personal_data_consent = forms.BooleanField(
         required=True,
         error_messages={
-            'reqired': 'Для регистрации необходимо согласие на обработку персональных данных'
+            'required': 'Для регистрации необходимо согласие на обработку персональных данных'
         },
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input',
