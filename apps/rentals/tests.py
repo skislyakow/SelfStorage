@@ -51,7 +51,7 @@ class OrderWizardTests(TestCase):
             {
                 "2-first_name": "Имя",
                 "2-phone": "79990000000",
-                "2-pd_consent": "on",
+                
             },
             r,
         )
@@ -65,7 +65,6 @@ class OrderWizardTests(TestCase):
         self.assertEqual(RentalOrder.objects.filter(user=self.user).count(), 1)
         self.user.refresh_from_db()
         self.assertEqual(self.user.first_name, "Имя")
-        self.assertTrue(self.user.pd_consent)
 
     def test_wizard_self_pickup_no_delivery(self):
         self.client.login(email="wizard@test.ru", password="pass1234")
@@ -78,7 +77,7 @@ class OrderWizardTests(TestCase):
             {
                 "2-first_name": "Имя",
                 "2-phone": "79990000000",
-                "2-pd_consent": "on",
+                
             },
             r,
         )
@@ -107,7 +106,7 @@ class OrderWizardTests(TestCase):
             {
                 "2-first_name": "Имя",
                 "2-phone": "79990000000",
-                "2-pd_consent": "on",
+                
             },
             r,
         )
@@ -121,3 +120,18 @@ class OrderWizardTests(TestCase):
         self.assertEqual(order.status, "awaiting_payment")
         self.box.refresh_from_db()
         self.assertEqual(self.box.status, "reserved")
+
+    def test_contacts_step_prefills_from_user(self):
+        self.user.first_name = "Пётр"
+        self.user.phone = "79991112233"
+        self.user.save()
+        self.client.login(email="wizard@test.ru", password="pass1234")
+        r = self.client.get(reverse("order_wizard"))
+        r = self._post_step(
+            {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
+        )
+        r = self._post_step({"1-delivery_type": "self"}, r)
+        content = r.content.decode()
+        self.assertIn('value="Пётр"', content)
+        self.assertIn('value="79991112233"', content)
+        self.assertNotIn("pd_consent", content)

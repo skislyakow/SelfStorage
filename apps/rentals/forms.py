@@ -34,9 +34,6 @@ class DeliveryForm(forms.Form):
 class ContactsForm(forms.Form):
     first_name = forms.CharField(label="Имя")
     phone = forms.CharField(label="Телефон")
-    pd_consent = forms.BooleanField(
-        label="Согласие на обработку персональных данных"
-    )
 
 
 class SummaryForm(forms.Form):

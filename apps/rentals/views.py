@@ -29,6 +29,10 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
             box_id = self.request.GET.get("box")
             if box_id:
                 initial["box"] = box_id
+        elif step == "2":
+            user = self.request.user
+            initial["first_name"] = user.first_name
+            initial["phone"] = user.phone
         return initial
 
     def get_form(self, step=None, data=None, files=None):
@@ -69,7 +73,6 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
         user = cast(User, self.request.user)
         user.first_name = data.get("first_name", "")
         user.phone = data["phone"]
-        user.pd_consent = bool(data.get("pd_consent", False))
         user.save()
 
         return render(self.request, "rentals/order_reserved.html", {"order": order})
