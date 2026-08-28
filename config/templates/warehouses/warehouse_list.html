@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Аренда боксов{% endblock %}
+
+{% block content %}
+<article class="row">
+	<div class="col-12 col-lg-6 mb-3 mb-lg-0">
+		<h1 class="fw-bold SelfStorage_green mb-5">Доставка и бережное хранение ваших вещей</h1>
+		<h4 class="fw-lighter SelfStorage_grey mb-5">Аренда бокса на любой срок. Бесплатная доставка от вашего дома</h4>
+		<form method="post" action="#">
+			{% csrf_token %}
+			<input type="email" required name="email" class="form-control border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Укажите ваш e-mail">
+			<button type="submit" class="btn border-8 py-3 px-5 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange">Рассчитать стоимость</button>
+			<span class="text-center fw-light">Нажимая на кнопку, вы подтверждаете свое <a href="#" class="link-dark">согласие на обработку персональных данных</a></span>
+		</form>
+	</div>
+	<div class="col-12 col-lg-6 SelfStorage__img"></div>
+</article>
+
+<article class="mt-header">
+	<h1 class="text-center fw-bold SelfStorage_green mb-5">Аренда боксов</h1>
+	<h6 class="text-center SelfStorage_grey mb-5">Арендуйте склад индивидуального хранения по уникальной цене прямо сейчас</h6>
+
+	{% if warehouses %}
+	<div class="d-flex flex-column">
+		{% for warehouse in warehouses %}
+		<a href="{% url 'warehouse_detail' warehouse.pk %}" class="row text-decoration-none py-3 px-4 mt-4 SelfStorage__boxlink">
+			<div class="col-12 col-lg-3 d-flex justify-content-center">
+				{% if warehouse.photo %}
+				<img src="{{ warehouse.photo.url }}" alt="{{ warehouse.city }}" class="mb-3 mb-lg-0" style="max-height: 120px; object-fit: cover;">
+				{% else %}
+				<img src="{% static 'img/image11.png' %}" alt="{{ warehouse.city }}" class="mb-3 mb-lg-0">
+				{% endif %}
+			</div>
+			<div class="col-12 col-md-4 col-lg-3 d-flex flex-column justify-content-center">
+				<h4 class="text-center">{{ warehouse.city }}</h4>
+				<h6 class="text-center">{{ warehouse.address }}</h6>
+			</div>
+			<div class="col-12 col-md-4 col-lg-3 d-flex flex-column justify-content-center">
+				<h4 class="text-center">{{ warehouse.free_count }} из {{ warehouse.total_count }}</h4>
+				<h6 class="text-center">Боксов свободно</h6>
+			</div>
+			<div class="col-12 col-md-4 col-lg-3 d-flex flex-column justify-content-center">
+				{% if warehouse.min_price %}
+				<h4 class="text-center SelfStorage_green">от {{ warehouse.min_price|floatformat:0 }} ₽</h4>
+				{% else %}
+				<h4 class="text-center SelfStorage_grey">Нет свободных</h4>
+				{% endif %}
+				<h6 class="text-center">{{ warehouse.feature }}</h6>
+			</div>
+		</a>
+		{% endfor %}
+	</div>
+	{% else %}
+	<p class="text-center SelfStorage_grey">Пока нет ни одного склада — загляните позже.</p>
+	{% endif %}
+</article>
+{% endblock %}
