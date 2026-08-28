@@ -60,11 +60,13 @@ class UserAdminTests(TestCase):
         list_resp = self.client.get("/admin/users/user/")
         self.assertEqual(list_resp.status_code, 200)
         self.assertContains(list_resp, "Телефон")
+        self.assertContains(list_resp, "Имя")
 
         user = User.objects.create_user(email="someone@test.ru", phone="+79990000000")
         change_resp = self.client.get(f"/admin/users/user/{user.pk}/change/")
         self.assertEqual(change_resp.status_code, 200)
         self.assertContains(change_resp, "Согласие ПД")
+        self.assertContains(change_resp, "Имя")
         self.assertNotContains(change_resp, 'id="id_groups"')
         self.assertNotContains(change_resp, 'id="id_user_permissions"')
         self.assertNotContains(change_resp, "Важные даты")
