@@ -1,10 +1,16 @@
+import logging
 from datetime import date
 
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.management import call_command
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
 from apps.rentals.models import DeliveryRequest, RentalOrder
+
+logger = logging.getLogger(__name__)
 
 NEED_CALL_STATUSES = ("overdue", "extended_6m")
 DELIVERY_ACTIVE_STATUSES = ("new", "in_progress")
@@ -45,6 +51,18 @@ def owner_dashboard(request, *args, **kwargs):
         rejected_count=rejected.count(),
     )
     return TemplateResponse(request, "admin/owner_dashboard.html", context)
+
+
+@staff_member_required
+def send_notifications_now(request, *args, **kwargs):
+    if request.method == "POST":
+        try:
+            call_command("send_notifications")
+            messages.success(request, "Уведомления об окончании аренды разосланы.")
+        except Exception:
+            logger.exception("Ручная рассылка уведомлений упала")
+            messages.error(request, "Не удалось разослать уведомления.")
+    return redirect("owner-dashboard")
 
 
 # Сделать «Панель владельца» главной страницей админки (вход по /admin/)

@@ -24,6 +24,11 @@
     Навигация по остальным моделям — в меню слева.
   </p>
 
+  <form method="post" action="{% url 'send-notifications' %}" class="mb-3">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Разослать уведомления сейчас</button>
+  </form>
+
   <div class="owner-cards">
     <div class="owner-card">Доставок к выполнению<b>{{ deliveries_count }}</b></div>
     <div class="owner-card">Просроченных — позвонить<b>{{ overdue_count }}</b></div>
