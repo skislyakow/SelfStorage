@@ -37,11 +37,11 @@ class Command(BaseCommand):
                     )
 
         # Просроченные: переводим в overdue и напоминаем ровно один раз — на 1-й день просрочки
-        for order in RentalOrder.objects.filter(status="active", end_date__lt=today):
-            order.status = "overdue"
-            order.save()
+        for order in RentalOrder.objects.filter(status__in=["active", "overdue"], end_date__lt=today):
+            if order.status == "active":
+                order.status = "overdue"
             days_overdue = (today - order.end_date).days
-            if days_overdue == 1:
+            if days_overdue == 1 and not order.overdue_notified:
                 try:
                     send_mail(
                         "Срок аренды просрочен!",
@@ -51,7 +51,9 @@ class Command(BaseCommand):
                         [order.user.email],
                         fail_silently=False,
                     )
+                    order.overdue_notified = True
                 except Exception:
                     logger.exception(
                         "Не удалось отправить письмо о просрочке для заказа %s", order.id
                     )
+            order.save()

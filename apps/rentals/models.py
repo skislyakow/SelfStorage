@@ -31,6 +31,9 @@ class RentalOrder(models.Model):
         choices=STATUS_CHOICES,
         default="awaiting_payment",
     )
+    overdue_notified = models.BooleanField(
+        "Письмо о просрочке отправлено", default=False
+    )
     promo = models.ForeignKey(
         "promotions.PromoCode",
         on_delete=models.SET_NULL,
