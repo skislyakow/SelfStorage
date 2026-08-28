@@ -6,6 +6,12 @@ from django.core.mail import send_mail
 logger = logging.getLogger(__name__)
 
 
+def greeting(user):
+    """Универсальное обращение по имени (без учёта пола), с запасным вариантом."""
+    first_name = getattr(user, "first_name", "") or ""
+    return f"Привет {first_name}," if first_name else "Уважаемый клиент,"
+
+
 def send_notification(user, subject, message, fail_silently=True):
     """Отправка письма конкретному пользователю.
 

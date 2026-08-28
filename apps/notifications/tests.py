@@ -24,6 +24,8 @@ class SendNotificationsTests(TestCase):
         )
 
     def test_reminder_sent_3_days_before_end(self):
+        self.user.first_name = "Мария"
+        self.user.save()
         RentalOrder.objects.create(
             user=self.user,
             box=self.box,
@@ -35,6 +37,20 @@ class SendNotificationsTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Заканчивается срок аренды!")
         self.assertEqual(mail.outbox[0].to, ["renter@example.com"])
+        self.assertIn("Привет Мария", mail.outbox[0].body)
+        self.assertNotIn("Уважаемый", mail.outbox[0].body)
+
+    def test_reminder_fallback_without_name(self):
+        RentalOrder.objects.create(
+            user=self.user,
+            box=self.box,
+            start_date=timezone.now().date() - timedelta(days=30),
+            end_date=timezone.now().date() + timedelta(days=3),
+            status="active",
+        )
+        call_command("send_notifications")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("Уважаемый клиент", mail.outbox[0].body)
 
     def test_no_reminder_when_far_away(self):
         RentalOrder.objects.create(
@@ -48,6 +64,8 @@ class SendNotificationsTests(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_overdue_marked_and_notified(self):
+        self.user.first_name = "Мария"
+        self.user.save()
         order = RentalOrder.objects.create(
             user=self.user,
             box=self.box,
@@ -60,3 +78,4 @@ class SendNotificationsTests(TestCase):
         self.assertEqual(order.status, "overdue")
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Срок аренды просрочен!")
+        self.assertIn("Привет Мария", mail.outbox[0].body)

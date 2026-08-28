@@ -47,6 +47,8 @@ class RegistrationTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ["welcome@test.ru"])
         self.assertIn("Добро пожаловать", mail.outbox[0].subject)
+        self.assertIn("Привет", mail.outbox[0].body)
+        self.assertNotIn("Уважаемый(ая)", mail.outbox[0].body)
         self.assertEqual(
             User.objects.get(email="welcome@test.ru").first_name, "Привет"
         )

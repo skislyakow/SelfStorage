@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from apps.rentals.models import RentalOrder
+from apps.notifications.email import greeting
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ class Command(BaseCommand):
                 try:
                     send_mail(
                         "Заканчивается срок аренды!",
-                        f"Уважаемый {order.user.email}, срок аренды бокса "
+                        f"{greeting(order.user)} срок аренды бокса "
                         f"заканчивается через {days} дней.",
                         None,
                         [order.user.email],
@@ -44,7 +45,7 @@ class Command(BaseCommand):
                 try:
                     send_mail(
                         "Срок аренды просрочен!",
-                        f"Уважаемый {order.user.email}, срок аренды бокса "
+                        f"{greeting(order.user)} срок аренды бокса "
                         f"просрочен на {days_overdue} дней.",
                         None,
                         [order.user.email],
