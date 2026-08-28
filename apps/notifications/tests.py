@@ -70,7 +70,7 @@ class SendNotificationsTests(TestCase):
             user=self.user,
             box=self.box,
             start_date=timezone.now().date() - timedelta(days=60),
-            end_date=timezone.now().date() - timedelta(days=30),
+            end_date=timezone.now().date() - timedelta(days=1),
             status="active",
         )
         call_command("send_notifications")
@@ -79,3 +79,16 @@ class SendNotificationsTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Срок аренды просрочен!")
         self.assertIn("Привет Мария", mail.outbox[0].body)
+
+    def test_overdue_old_not_notified(self):
+        RentalOrder.objects.create(
+            user=self.user,
+            box=self.box,
+            start_date=timezone.now().date() - timedelta(days=60),
+            end_date=timezone.now().date() - timedelta(days=30),
+            status="active",
+        )
+        call_command("send_notifications")
+        order = RentalOrder.objects.first()
+        self.assertEqual(order.status, "overdue")
+        self.assertEqual(len(mail.outbox), 0)
