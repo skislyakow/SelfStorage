@@ -19,7 +19,7 @@ DELIVERY_TYPES = [
 
 class BoxForm(forms.Form):
     box = forms.ModelChoiceField(
-        queryset=Box.objects.all(),
+        queryset=Box.objects.filter(status="free"),
         label="Бокс",
         widget=forms.Select(attrs={"class": INPUT_CLASS}),
     )

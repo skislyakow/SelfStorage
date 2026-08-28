@@ -19,7 +19,7 @@ def warehouse_list(request):
 
 def warehouse_detail(request, pk):
     warehouse = get_object_or_404(Warehouse, pk=pk)
-    boxes = Box.objects.filter(warehouse=warehouse)
+    boxes = Box.objects.filter(warehouse=warehouse, status="free")
 
     filters = {}
     floor = request.GET.get("floor")
@@ -46,11 +46,6 @@ def warehouse_detail(request, pk):
                 filters[param] = value
             except ValueError:
                 pass
-
-    status = request.GET.get("status")
-    if status in dict(Box.STATUS_CHOICES):
-        boxes = boxes.filter(status=status)
-        filters["status"] = status
 
     return render(
         request,
