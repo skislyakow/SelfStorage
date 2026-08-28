@@ -60,9 +60,24 @@ python manage.py runserver
 
 ### Уведомления (`send_notifications`)
 
-Команда `python manage.py send_notifications` шлёт напоминания за 30/14/7/3 дня до окончания аренды (`status='active'`) и письма о просрочке (каждые 30 дней после перевода в `overdue`). Чтобы письма реально уходили, запускайте её по расписанию, например cron раз в сутки на VPS:
+Команда `python manage.py send_notifications` шлёт напоминания за 30/14/7/3 дня до окончания аренды (`status='active'`) и письма о просрочке (каждые 30 дней после перевода в `overdue`). Отправка устойчива к сбоям SMTP: ошибка для одного клиента логируется и не прерывает рассылку остальным.
 
+**Автозапуск на сервере (systemd timer).** В репозитории лежат юниты `selfstorage-notify.service` (oneshot — запуск команды) и `selfstorage-notify.timer` (ежедневно в 09:00). `deploy.sh` сам копирует их в `/etc/systemd/system/`, делает `systemctl daemon-reload` и `systemctl enable --now selfstorage-notify.timer`, поэтому при автодеплое таймер поднимается автоматически. VPS-пути: проект `/opt/selftorage`, venv `/opt/selftorage/.venv`, лог `/var/log/selftorage/send_notifications.log`.
+
+Проверка на сервере:
+
+```bash
+systemctl list-timers selfstorage-notify.timer
+journalctl -u selfstorage-notify.service -n 50
+cat /var/log/selftorage/send_notifications.log
 ```
-0 9 * * * cd /opt/selftorage && /opt/selftorage/venv/bin/python manage.py send_notifications >> /opt/selftorage/notifications.log 2>&1
+
+**Быстрая проверка вручную** (без ожидания расписания): в админке `/admin/rentals/rentalorder/` выставьте тестовому заказу `end_date = сегодня + 3` (или `сегодня - 1` для просрочки) и `status='active'`, затем на сервере:
+
+```bash
+cd /opt/selftorage
+/opt/selftorage/.venv/bin/python manage.py send_notifications
 ```
+
+Письмо придёт на email пользователя заказа (на проде — реально; локально без SMTP — в консоль).
 

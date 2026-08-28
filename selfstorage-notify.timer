@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily SelfStorage reminder emails
+
+[Timer]
+OnCalendar=*-*-* 09:00:00
+Persistent=true
+Unit=selfstorage-notify.service
+
+[Install]
+WantedBy=timers.target

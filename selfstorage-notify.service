@@ -1,0 +1,12 @@
+[Unit]
+Description=SelfStorage daily rental reminders (send_notifications)
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/selftorage
+EnvironmentFile=/opt/selftorage/.env
+ExecStart=/opt/selftorage/.venv/bin/python manage.py send_notifications
+StandardOutput=append:/var/log/selftorage/send_notifications.log
+StandardError=append:/var/log/selftorage/send_notifications.log
