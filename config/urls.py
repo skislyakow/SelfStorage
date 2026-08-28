@@ -3,10 +3,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from config import views
-from config.admin_dashboard import owner_dashboard
+from config.admin_dashboard import owner_dashboard, send_notifications_now
 
 urlpatterns = [
     path("admin/owner-dashboard/", owner_dashboard, name="owner-dashboard"),
+    path("admin/send-notifications/", send_notifications_now, name="send-notifications"),
     path("admin/", admin.site.urls),
     path("", views.HomeView.as_view(), name="home"),
     path("faq/", views.FaqView.as_view(), name="faq"),

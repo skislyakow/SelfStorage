@@ -54,6 +54,17 @@ class OwnerDashboardTests(TestCase):
         dr.refresh_from_db()
         self.assertEqual(dr.status, "done")
 
+    def test_send_notifications_button_runs_command(self):
+        from unittest.mock import patch
+
+        admin = User.objects.get(email="admin@selfstorage.ru")
+        self.client.force_login(admin)
+        with patch("config.admin_dashboard.call_command") as mock_cc:
+            resp = self.client.post("/admin/send-notifications/")
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(resp["Location"], "/admin/owner-dashboard/")
+        mock_cc.assert_called_once_with("send_notifications")
+
     def test_delivery_add_requires_order(self):
         admin = User.objects.get(email="admin@selfstorage.ru")
         self.client.force_login(admin)
