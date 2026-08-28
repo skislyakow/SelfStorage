@@ -86,3 +86,38 @@ class OrderWizardTests(TestCase):
 
         self.assertEqual(RentalOrder.objects.count(), 1)
         self.assertEqual(DeliveryRequest.objects.count(), 0)
+
+    def test_wizard_prefills_box_from_query(self):
+        self.client.login(email="wizard@test.ru", password="pass1234")
+        r = self.client.get(reverse("order_wizard") + f"?box={self.box.pk}")
+        content = r.content.decode()
+        self.assertIn(f'value="{self.box.pk}"', content)
+        self.assertIn("selected", content)
+
+    def test_wizard_completes_with_confirmation_and_reserves(self):
+        self.client.login(email="wizard@test.ru", password="pass1234")
+        r = self.client.get(reverse("order_wizard") + f"?box={self.box.pk}")
+        r = self._post_step(
+            {"0-box": str(self.box.pk), "0-rental_months": "3"}, r
+        )
+        r = self._post_step(
+            {"1-delivery_type": "delivery", "1-address": "ул. Тест"}, r
+        )
+        r = self._post_step(
+            {
+                "2-first_name": "Имя",
+                "2-phone": "79990000000",
+                "2-pd_consent": "on",
+            },
+            r,
+        )
+        r = self._post_step({}, r)
+
+        self.assertEqual(r.status_code, 200)
+        content = r.content.decode().lower()
+        self.assertIn("забронирован", content)
+        self.assertIn("оплат", content)
+        order = RentalOrder.objects.get()
+        self.assertEqual(order.status, "awaiting_payment")
+        self.box.refresh_from_db()
+        self.assertEqual(self.box.status, "reserved")

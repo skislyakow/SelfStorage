@@ -95,7 +95,11 @@
 			</div>
 			<div class="col-12 col-lg-2">
 				{% if box.status == 'free' %}
-				<a href="#" class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange border-8">От {{ box.price_per_month|floatformat:0 }} ₽</a>
+				{% if user.is_authenticated %}
+				<a href="{% url 'order_wizard' %}?box={{ box.pk }}" class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange border-8">От {{ box.price_per_month|floatformat:0 }} ₽</a>
+				{% else %}
+				<a href="#" data-bs-toggle="modal" data-bs-target="#SignModal" data-wizard-next="{% url 'order_wizard' %}?box={{ box.pk }}" class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange border-8">От {{ box.price_per_month|floatformat:0 }} ₽</a>
+				{% endif %}
 				{% else %}
 				<span class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_grey border-8 disabled">{{ box.price_per_month|floatformat:0 }} ₽</span>
 				{% endif %}
@@ -107,4 +111,12 @@
 	<p class="text-center SelfStorage_grey">По этому фильтру боксов не нашлось — попробуйте другой диапазон.</p>
 	{% endif %}
 </article>
+<script>
+  document.querySelectorAll('[data-wizard-next]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var inp = document.querySelector('#SignModal input[name="next"]');
+      if (inp) inp.value = btn.getAttribute('data-wizard-next');
+    });
+  });
+</script>
 {% endblock %}

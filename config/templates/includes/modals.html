@@ -30,8 +30,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body d-flex justify-content-center align-items-center">
-                <form class="d-flex flex-column align-items-center" style="max-width: 420px" method="post" action="{% url 'users:login' %}">
-                    {% csrf_token %}
+<form class="d-flex flex-column align-items-center" style="max-width: 420px" method="post" action="{% url 'users:login' %}">
+{% csrf_token %}
+<input type="hidden" name="next" value="{{ request.get_full_path }}">
                     <h1 class="modal-title text-center fw-bold mb-3" id="SignModalLabel">Вход</h1>
                     <input type="email" required name="username" class="form-control  border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="E-mail">
                     <input type="password" required name="password" class="form-control  border-8 mb-4 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Пароль">
