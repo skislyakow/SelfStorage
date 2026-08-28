@@ -1,8 +1,12 @@
 import re
+from datetime import timedelta
+from decimal import Decimal
 
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.utils import timezone
 
+from apps.promotions.models import PromoCode
 from apps.rentals.models import DeliveryRequest, RentalOrder
 from apps.warehouses.models import Box, Warehouse
 from apps.users.models import User
@@ -135,3 +139,50 @@ class OrderWizardTests(TestCase):
         self.assertIn('value="Пётр"', content)
         self.assertIn('value="79991112233"', content)
         self.assertNotIn("pd_consent", content)
+
+    def test_wizard_applies_promo(self):
+        promo = PromoCode.objects.create(
+            code="TEST20",
+            discount_percent=20,
+            valid_from=timezone.localdate(),
+            valid_to=timezone.localdate() + timedelta(days=90),
+        )
+        self.client.login(email="wizard@test.ru", password="pass1234")
+        r = self.client.get(reverse("order_wizard") + f"?box={self.box.pk}")
+        r = self._post_step(
+            {"0-box": str(self.box.pk), "0-rental_months": "3"}, r
+        )
+        r = self._post_step({"1-delivery_type": "self"}, r)
+        r = self._post_step(
+            {
+                "2-first_name": "Имя",
+                "2-phone": "79990000000",
+                "2-promo_code": "TEST20",
+            },
+            r,
+        )
+        self.assertEqual(r.status_code, 200)
+        order = RentalOrder.objects.get()
+        self.assertEqual(order.promo, promo)
+        self.assertEqual(order.amount, Decimal("7200"))
+        content = r.content.decode().lower()
+        self.assertIn("test20", content)
+        self.assertIn("7200", content)
+
+    def test_wizard_invalid_promo_blocks(self):
+        self.client.login(email="wizard@test.ru", password="pass1234")
+        r = self.client.get(reverse("order_wizard") + f"?box={self.box.pk}")
+        r = self._post_step(
+            {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
+        )
+        r = self._post_step({"1-delivery_type": "self"}, r)
+        r = self._post_step(
+            {
+                "2-first_name": "Имя",
+                "2-phone": "79990000000",
+                "2-promo_code": "NOPE",
+            },
+            r,
+        )
+        self.assertEqual(RentalOrder.objects.count(), 0)
+        self.assertIn("Промокод истёк или неверен", r.content.decode())
