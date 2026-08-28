@@ -54,7 +54,7 @@ python manage.py runserver
 - `ALLOWED_HOSTS` — через запятую, напр. `selftorage.kislyakov.pro`.
 - `DB_PATH` — путь к sqlite, напр. `/opt/selftorage/db.sqlite3`.
 - `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`
-- `EMAIL_HOST`, `EMAIL_PORT` (587), `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS=True`, `DEFAULT_FROM_EMAIL`. Для REG.RU точный SMTP-хост — в панели `Почта → настройки почтового клиента`; у домена должны быть MX/SPF/DKIM, иначе письма не дойдут.
+- `EMAIL_HOST=mail.hosting.reg.ru`, `EMAIL_PORT` (587 + `EMAIL_USE_TLS=True` либо 465 + `EMAIL_USE_SSL=True`), `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`. У домена `kislyakov.pro` должны быть опубликованы SPF/DKIM/DMARC, иначе письма уйдут в спам.
 
 Без SMTP-настроек письма не дойдут (упадут в консоль), но сайт продолжает работать.
 
