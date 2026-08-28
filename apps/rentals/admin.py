@@ -88,8 +88,8 @@ class OverdueCallFilter(admin.SimpleListFilter):
 
 @admin.register(RentalOrder)
 class RentalOrderAdmin(admin.ModelAdmin):
-    list_display = ("id", "client", "box_info", "status", "end_date", "days_overdue", "last_overdue_notified")
-    list_filter = ("status", OverdueCallFilter)
+    list_display = ("id", "client", "box_info", "status", "end_date", "days_overdue", "traffic_source", "last_overdue_notified")
+    list_filter = ("status", "traffic_source", OverdueCallFilter)
     search_fields = ("user__email", "user__phone", "box__number")
     list_select_related = ("user", "box__warehouse")
 

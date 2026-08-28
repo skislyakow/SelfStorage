@@ -65,6 +65,16 @@ class OwnerDashboardTests(TestCase):
         self.assertEqual(resp["Location"], "/admin/owner-dashboard/")
         mock_cc.assert_called_once_with("send_notifications")
 
+    def test_dashboard_shows_traffic_sources(self):
+        admin = User.objects.get(email="admin@selfstorage.ru")
+        self.client.force_login(admin)
+        resp = self.client.get("/admin/owner-dashboard/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Источники трафика")
+        self.assertContains(resp, "vk")
+        self.assertContains(resp, "google")
+        self.assertContains(resp, "direct")
+
     def test_delivery_add_requires_order(self):
         admin = User.objects.get(email="admin@selfstorage.ru")
         self.client.force_login(admin)

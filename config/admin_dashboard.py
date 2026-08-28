@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.management import call_command
+from django.db.models import Count, Sum
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
@@ -40,6 +41,23 @@ def owner_dashboard(request, *args, **kwargs):
         {"order": order, "days": (today - order.end_date).days} for order in overdue
     ]
 
+    raw_sources = (
+        RentalOrder.objects.values("traffic_source")
+        .annotate(orders=Count("id"), clients=Count("user", distinct=True), revenue=Sum("amount"))
+        .order_by("-orders")
+    )
+    traffic_sources = []
+    traffic_total = {"orders": 0, "clients": 0, "revenue": 0}
+    for row in raw_sources:
+        label = row["traffic_source"] or "(без метки)"
+        revenue = row["revenue"] or 0
+        traffic_sources.append(
+            {"source": label, "orders": row["orders"], "clients": row["clients"], "revenue": revenue}
+        )
+        traffic_total["orders"] += row["orders"]
+        traffic_total["clients"] += row["clients"]
+        traffic_total["revenue"] += revenue
+
     context = dict(
         admin.site.each_context(request),
         title="Панель владельца",
@@ -49,6 +67,8 @@ def owner_dashboard(request, *args, **kwargs):
         deliveries_count=deliveries.count(),
         overdue_count=overdue.count(),
         rejected_count=rejected.count(),
+        traffic_sources=traffic_sources,
+        traffic_total=traffic_total,
     )
     return TemplateResponse(request, "admin/owner_dashboard.html", context)
 

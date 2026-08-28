@@ -186,3 +186,54 @@ class OrderWizardTests(TestCase):
         )
         self.assertEqual(RentalOrder.objects.count(), 0)
         self.assertIn("Промокод истёк или неверен", r.content.decode())
+
+    def test_wizard_captures_traffic_source(self):
+        self.client.login(email="wizard@test.ru", password="pass1234")
+        r = self.client.get(reverse("order_wizard") + "?utm_source=facebook")
+        r = self._post_step(
+            {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
+        )
+        r = self._post_step({"1-delivery_type": "self"}, r)
+        r = self._post_step(
+            {
+                "2-first_name": "Имя",
+                "2-phone": "79990000000",
+            },
+            r,
+        )
+        order = RentalOrder.objects.get()
+        self.assertEqual(order.traffic_source, "facebook")
+
+    def test_wizard_without_traffic_source_is_empty(self):
+        self.client.login(email="wizard@test.ru", password="pass1234")
+        r = self.client.get(reverse("order_wizard"))
+        r = self._post_step(
+            {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
+        )
+        r = self._post_step({"1-delivery_type": "self"}, r)
+        r = self._post_step(
+            {
+                "2-first_name": "Имя",
+                "2-phone": "79990000000",
+            },
+            r,
+        )
+        order = RentalOrder.objects.get()
+        self.assertEqual(order.traffic_source, "")
+
+
+class TrafficSourceMiddlewareTests(TestCase):
+    def test_middleware_sets_session_from_utm_source(self):
+        c = Client()
+        c.get(reverse("order_wizard") + "?utm_source=vk")
+        self.assertEqual(c.session.get("traffic_source"), "vk")
+
+    def test_middleware_sets_session_from_src_alias(self):
+        c = Client()
+        c.get(reverse("order_wizard") + "?src=instagram")
+        self.assertEqual(c.session.get("traffic_source"), "instagram")
+
+    def test_middleware_ignores_without_param(self):
+        c = Client()
+        c.get(reverse("order_wizard"))
+        self.assertNotIn("traffic_source", c.session)

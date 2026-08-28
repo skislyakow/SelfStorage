@@ -81,3 +81,30 @@ cd /opt/selftorage
 
 Письмо придёт на email пользователя заказа (на проде — реально; локально без SMTP — в консоль).
 
+## Учёт источника рекламы
+
+Чтобы узнать, сколько заказов пришло с конкретной рекламы, помечайте рекламные
+ссылки UTM-параметром `utm_source` (или алиасом `src`). Middleware
+(`apps/rentals/middleware.py`) сохраняет метку в сессии посетителя, а при
+оформлении заказа визардом она записывается в `RentalOrder.traffic_source` и
+«переживает» весь путь до оплаты, даже если пользователь зашёл с рекламы, а
+заказ оформил позже.
+
+Где смотреть результаты:
+- фильтр `traffic_source` в `/admin/rentals/rentalorder/`;
+- карточка «Источники трафика» на дашборде владельца — таблица
+  `Источник | Заказов | Клиентов | Выручка` (пустые метки — `(без метки)`).
+
+### Примеры рекламных ссылок
+
+| Источник | Ссылка |
+|----------|--------|
+| ВКонтакте | `https://selftorage.kislyakov.pro/?utm_source=vk` |
+| Google Ads | `https://selftorage.kislyakov.pro/?utm_source=google` |
+| Яндекс.Директ (сразу на бокс) | `https://selftorage.kislyakov.pro/rentals/wizard/?box=1&utm_source=yandex` |
+| Facebook | `https://selftorage.kislyakov.pro/?utm_source=facebook&utm_campaign=vesna` |
+| Instagram (алиас `src`) | `https://selftorage.kislyakov.pro/?src=instagram` |
+
+После `seed_demo` в базе уже есть тестовые заказы с метками `vk`, `google`,
+`direct` и `demo` — карточка на дашборде сразу покажет пример статистики.
+
