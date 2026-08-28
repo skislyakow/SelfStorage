@@ -103,6 +103,7 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
             status="awaiting_payment",
             promo=promo,
             amount=calc["total"],
+            traffic_source=self.request.session.get("traffic_source", ""),
         )
         box.status = "reserved"
         box.save()

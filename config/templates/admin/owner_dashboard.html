@@ -35,6 +35,40 @@
     <div class="owner-card">Отклонено доставчиком<b>{{ rejected_count }}</b></div>
   </div>
 
+  <h2>Источники трафика</h2>
+  <p class="muted">Сколько заказов пришло с рекламы/источника (метка из ссылки <code>?utm_source=</code>).</p>
+  {% if traffic_sources %}
+  <table class="owner-table">
+    <thead>
+      <tr>
+        <th>Источник</th>
+        <th>Заказов</th>
+        <th>Клиентов</th>
+        <th>Выручка</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in traffic_sources %}
+      <tr>
+        <td>{{ s.source }}</td>
+        <td>{{ s.orders }}</td>
+        <td>{{ s.clients }}</td>
+        <td>{{ s.revenue }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td><b>Итого</b></td>
+        <td><b>{{ traffic_total.orders }}</b></td>
+        <td><b>{{ traffic_total.clients }}</b></td>
+        <td><b>{{ traffic_total.revenue }}</b></td>
+      </tr>
+    </tbody>
+  </table>
+  <p><a href="{% url 'admin:rentals_rentalorder_changelist' %}">Все заказы в админке →</a></p>
+  {% else %}
+  <p class="muted">Нет заказов.</p>
+  {% endif %}
+
   <h2>Доставки к выполнению</h2>
   {% if deliveries %}
   <table class="owner-table">
