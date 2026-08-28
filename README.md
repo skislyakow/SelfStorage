@@ -42,3 +42,27 @@ python manage.py runserver
 ## Договорённости
 
 Общие контракты (имена URL, переменные шаблонов, сигналы) зафиксированы в `CONVENTIONS.md`. Перед добавлением нового URL/сигнала/переменной — обнови этот файл.
+
+## Переменные окружения / VPS
+
+Проект читает `.env` в корне через `django-environ` (`env.read_env`). Файл `.env` находится в `.gitignore` — **не коммитится**. Шаблон всех переменных — в `.env.example`.
+
+Локально (dev) `.env` необязателен: по умолчанию `DEBUG` берётся из окружения, а почта уходит в **консоль** (`console.EmailBackend`). На продакшене в `.env` на VPS нужно задать реальные значения, которых нет локально:
+
+- `SECRET_KEY` — уникальный секрет (обязательно отличный от дефолта).
+- `DEBUG=False`
+- `ALLOWED_HOSTS` — через запятую, напр. `selftorage.kislyakov.pro`.
+- `DB_PATH` — путь к sqlite, напр. `/opt/selftorage/db.sqlite3`.
+- `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`
+- `EMAIL_HOST`, `EMAIL_PORT` (587), `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS=True`, `DEFAULT_FROM_EMAIL`.
+
+Без SMTP-настроек письма не дойдут (упадут в консоль), но сайт продолжает работать.
+
+### Уведомления (`send_notifications`)
+
+Команда `python manage.py send_notifications` шлёт напоминания за 30/14/7/3 дня до окончания аренды (`status='active'`) и письма о просрочке (каждые 30 дней после перевода в `overdue`). Чтобы письма реально уходили, запускайте её по расписанию, например cron раз в сутки на VPS:
+
+```
+0 9 * * * cd /opt/selftorage && /opt/selftorage/venv/bin/python manage.py send_notifications >> /opt/selftorage/notifications.log 2>&1
+```
+
