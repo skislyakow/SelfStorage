@@ -12,6 +12,19 @@ def greeting(user):
     return f"Привет {first_name}," if first_name else "Уважаемый клиент,"
 
 
+def plural_days(n):
+    """Русская плюрализация существительного 'день': 1 день, 2 дня, 5 дней."""
+    n = abs(int(n)) % 100
+    if 10 <= n <= 20:
+        return "дней"
+    n %= 10
+    if n == 1:
+        return "день"
+    if 2 <= n <= 4:
+        return "дня"
+    return "дней"
+
+
 def send_notification(user, subject, message, fail_silently=True):
     """Отправка письма конкретному пользователю.
 
