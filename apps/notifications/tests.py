@@ -76,6 +76,7 @@ class SendNotificationsTests(TestCase):
         call_command("send_notifications")
         order.refresh_from_db()
         self.assertEqual(order.status, "overdue")
+        self.assertTrue(order.overdue_notified)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "Срок аренды просрочен!")
         self.assertIn("Привет Мария", mail.outbox[0].body)
@@ -91,4 +92,34 @@ class SendNotificationsTests(TestCase):
         call_command("send_notifications")
         order = RentalOrder.objects.first()
         self.assertEqual(order.status, "overdue")
+        self.assertFalse(order.overdue_notified)
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_overdue_already_overdue_day1_emailed(self):
+        self.user.first_name = "Мария"
+        self.user.save()
+        order = RentalOrder.objects.create(
+            user=self.user,
+            box=self.box,
+            start_date=timezone.now().date() - timedelta(days=60),
+            end_date=timezone.now().date() - timedelta(days=1),
+            status="overdue",
+        )
+        call_command("send_notifications")
+        order.refresh_from_db()
+        self.assertTrue(order.overdue_notified)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("Привет Мария", mail.outbox[0].body)
+
+    def test_overdue_not_resends(self):
+        RentalOrder.objects.create(
+            user=self.user,
+            box=self.box,
+            start_date=timezone.now().date() - timedelta(days=60),
+            end_date=timezone.now().date() - timedelta(days=1),
+            status="active",
+        )
+        call_command("send_notifications")
+        self.assertEqual(len(mail.outbox), 1)
+        call_command("send_notifications")
+        self.assertEqual(len(mail.outbox), 1)
