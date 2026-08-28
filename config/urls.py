@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from config import views
@@ -13,3 +15,5 @@ urlpatterns = [
     path("orders/", include("apps.rentals.urls")),
     path("accounts/", include("apps.users.urls")),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
