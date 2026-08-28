@@ -97,6 +97,11 @@ EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
 # релей отклоняется с 451. Поэтому по умолчанию — реальный ящик, а не noreply@.
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="selfstorage@kislyakov.pro")
 
+# YooKassa (Юмани) — приём оплат за аренду боксов
+YOOKASSA_SHOP_ID = env("YOOKASSA_SHOP_ID", default="")
+YOOKASSA_SECRET_KEY = env("YOOKASSA_SECRET_KEY", default="")
+SITE_URL = env("SITE_URL", default="https://selfstorage.kislyakov.pro")
+
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
