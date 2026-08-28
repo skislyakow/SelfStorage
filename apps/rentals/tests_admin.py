@@ -33,6 +33,8 @@ class OwnerDashboardTests(TestCase):
         self.assertContains(resp, "Одинцово, ул. Победы")
         self.assertContains(resp, "Просроченные")
         self.assertContains(resp, "Отказ принять на доставку")
+        self.assertContains(resp, "Екатерина")
+        self.assertContains(resp, "Ира")
 
     def test_delivery_action_mark_done(self):
         admin = User.objects.get(email="admin@selfstorage.ru")

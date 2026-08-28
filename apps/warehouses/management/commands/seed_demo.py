@@ -98,11 +98,16 @@ class Command(BaseCommand):
         # Пользователи: Екатерина (как в макете) + суперюзер для админки
         user = User.objects.create_user(
             email="ekatyusha89@yandex.ru",
+            first_name="Екатерина",
             phone="+7-909-000-00-00",
             password="111111111",
             pd_consent=True,
         )
-        User.objects.create_superuser(email="admin@selfstorage.ru", password="admin12345")
+        User.objects.create_superuser(
+            email="admin@selfstorage.ru",
+            first_name="Администратор",
+            password="admin12345",
+        )
 
         promo_storage15 = PromoCode.objects.create(
             code="storage15",
@@ -195,31 +200,32 @@ class Command(BaseCommand):
 
         # Демо-клиенты для множества заявок на доставку (разные люди)
         CLIENTS = [
-            ("ira@mail.ru", "+7-909-111-22-33"),
-            ("petr@mail.ru", "+7-916-222-33-44"),
-            ("sveta@mail.ru", "+7-985-333-44-55"),
-            ("anton@mail.ru", "+7-903-444-55-66"),
-            ("olga@mail.ru", "+7-912-555-66-77"),
-            ("dmitry@mail.ru", "+7-977-666-77-88"),
-            ("nik@mail.ru", "+7-905-777-11-22"),
-            ("maria@mail.ru", "+7-919-888-33-44"),
-            ("igor@mail.ru", "+7-903-999-55-66"),
-            ("anna@mail.ru", "+7-916-000-77-88"),
-            ("pavel@mail.ru", "+7-985-121-99-00"),
-            ("kara@mail.ru", "+7-977-323-44-55"),
-            ("roma@mail.ru", "+7-903-111-44-55"),
-            ("vika@mail.ru", "+7-916-222-55-66"),
-            ("timur@mail.ru", "+7-985-333-66-77"),
-            ("liza@mail.ru", "+7-909-444-77-88"),
+            ("ira@mail.ru", "Ира", "+7-909-111-22-33"),
+            ("petr@mail.ru", "Пётр", "+7-916-222-33-44"),
+            ("sveta@mail.ru", "Света", "+7-985-333-44-55"),
+            ("anton@mail.ru", "Антон", "+7-903-444-55-66"),
+            ("olga@mail.ru", "Ольга", "+7-912-555-66-77"),
+            ("dmitry@mail.ru", "Дмитрий", "+7-977-666-77-88"),
+            ("nik@mail.ru", "Никита", "+7-905-777-11-22"),
+            ("maria@mail.ru", "Мария", "+7-919-888-33-44"),
+            ("igor@mail.ru", "Игорь", "+7-903-999-55-66"),
+            ("anna@mail.ru", "Анна", "+7-916-000-77-88"),
+            ("pavel@mail.ru", "Павел", "+7-985-121-99-00"),
+            ("kara@mail.ru", "Кара", "+7-977-323-44-55"),
+            ("roma@mail.ru", "Рома", "+7-903-111-44-55"),
+            ("vika@mail.ru", "Вика", "+7-916-222-55-66"),
+            ("timur@mail.ru", "Тимур", "+7-985-333-66-77"),
+            ("liza@mail.ru", "Лиза", "+7-909-444-77-88"),
         ]
         clients = {
             email: User.objects.create_user(
                 email=email,
+                first_name=name,
                 phone=phone,
                 password="111111111",
                 pd_consent=True,
             )
-            for email, phone in CLIENTS
+            for email, name, phone in CLIENTS
         }
 
         # Заявки на доставку с разными статусами, адресами и клиентами;

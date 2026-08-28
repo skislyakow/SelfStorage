@@ -36,6 +36,7 @@
     <thead>
       <tr>
         <th>Заказ</th>
+        <th>Клиент</th>
         <th>Склад (куда привезти)</th>
         <th>Бокс</th>
         <th>Адрес забора (у клиента)</th>
@@ -49,6 +50,10 @@
       {% for d in deliveries %}
       <tr>
         <td><a href="{% url 'admin:rentals_rentalorder_change' d.order_id %}">#{{ d.order_id }}</a></td>
+        <td>
+          {{ d.order.user.first_name|default:"—" }}
+          <div class="muted">{{ d.order.user.email }}</div>
+        </td>
         <td>{{ d.order.box.warehouse }}</td>
         <td>{{ d.order.box.number }}</td>
         <td>
@@ -88,6 +93,10 @@
       {% for d in rejected %}
       <tr>
         <td><a href="{% url 'admin:rentals_rentalorder_change' d.order_id %}">#{{ d.order_id }}</a></td>
+        <td>
+          {{ d.order.user.first_name|default:"—" }}
+          <div class="muted">{{ d.order.user.email }}</div>
+        </td>
         <td>{{ d.order.box.warehouse }}</td>
         <td>{{ d.order.box.number }}</td>
         <td>
@@ -126,7 +135,10 @@
       {% with o=row.order %}
       <tr>
         <td><a href="{% url 'admin:rentals_rentalorder_change' o.pk %}">#{{ o.pk }}</a></td>
-        <td>{{ o.user.email }}</td>
+        <td>
+          {{ o.user.first_name|default:"—" }}
+          <div class="muted">{{ o.user.email }}</div>
+        </td>
         <td>{% if o.user.phone %}<a href="tel:{{ o.user.phone }}">{{ o.user.phone }}</a>{% else %}<span class="muted">—</span>{% endif %}</td>
         <td>{{ o.box.number }}</td>
         <td>{{ o.box.warehouse }}</td>
