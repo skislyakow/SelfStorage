@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from apps.rentals.models import RentalOrder
-from apps.notifications.email import greeting
+from apps.notifications.email import greeting, plural_days
 
 logger = logging.getLogger(__name__)
 
@@ -36,22 +36,29 @@ class Command(BaseCommand):
                         "Не удалось отправить напоминание для заказа %s", order.id
                     )
 
-        # Просроченные: переводим в overdue и напоминаем ровно один раз — на 1-й день просрочки
+        # Просроченные: переводим в overdue и напоминаем раз в месяц, начиная с 1-го дня
         for order in RentalOrder.objects.filter(status__in=["active", "overdue"], end_date__lt=today):
             if order.status == "active":
                 order.status = "overdue"
             days_overdue = (today - order.end_date).days
-            if days_overdue == 1 and not order.overdue_notified:
+            if days_overdue >= 1 and (
+                order.last_overdue_notified is None
+                or (today - order.last_overdue_notified).days >= 30
+            ):
                 try:
                     send_mail(
                         "Срок аренды просрочен!",
-                        f"{greeting(order.user)} срок аренды бокса "
-                        f"просрочен на {days_overdue} дней.",
+                        f"{greeting(order.user)} срок аренды бокса №{order.box.number} "
+                        f"закончился {days_overdue} {plural_days(days_overdue)} назад.\n\n"
+                        f"Ваши вещи будут храниться ещё 6 месяцев по повышенному тарифу. "
+                        f"Если вы не заберёте или не продлите аренду в течение этого срока, "
+                        f"вещи будут списаны — вы их потеряете.\n\n"
+                        f"Пожалуйста, продлите аренду или заберите вещи в личном кабинете.",
                         None,
                         [order.user.email],
                         fail_silently=False,
                     )
-                    order.overdue_notified = True
+                    order.last_overdue_notified = today
                 except Exception:
                     logger.exception(
                         "Не удалось отправить письмо о просрочке для заказа %s", order.id
