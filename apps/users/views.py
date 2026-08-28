@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib import messages
 from .forms import CustomUserCreationForm
-from apps.notifications.email import send_notification
+from apps.notifications.email import greeting, send_notification
 
 def register(request):
     if request.method == 'POST':
@@ -14,10 +14,10 @@ def register(request):
             send_notification(
                 user,
                 "Добро пожаловать в SelfStorage",
-                "Уважаемый(ая) {name}!\n\n"
+                f"{greeting(user)}\n\n"
                 "Спасибо за регистрацию в SelfStorage. Теперь вы можете подбирать "
                 "боксы на карте, оформлять заказы и управлять ими из личного кабинета.\n\n"
-                "С уважением,\nкоманда SelfStorage.".format(name=user.first_name or user.email),
+                "С уважением,\nкоманда SelfStorage.",
             )
             login(request, user)
             messages.success(request, 'Регистрация прошла успешно!')

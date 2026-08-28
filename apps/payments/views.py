@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from yookassa import Configuration, Payment as YooPayment
 
-from apps.notifications.email import send_notification
+from apps.notifications.email import greeting, send_notification
 from apps.payments.models import Payment
 from apps.rentals.models import RentalOrder
 from apps.warehouses.models import Box
@@ -115,7 +115,7 @@ def _mark_paid(payment, order):
             order.user,
             "Оплата получена — SelfStorage",
             (
-                f"Спасибо! Оплата заказа #{order.id} "
+                f"{greeting(order.user)} Спасибо! Оплата заказа #{order.id} "
                 f"(бокс №{order.box.number}, {order.box.area} м²) получена.\n"
                 f"Сумма: {order.amount} ₽.\n"
                 f"Забронированный срок: с {order.start_date:%d.%m.%Y} по {order.end_date:%d.%m.%Y}."

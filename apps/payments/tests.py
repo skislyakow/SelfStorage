@@ -69,6 +69,8 @@ class PaymentFlowTests(TestCase):
 
     @patch("apps.payments.views.send_notification")
     def test_webhook_marks_order_active_and_box_occupied(self, mock_mail):
+        self.user.first_name = "Мария"
+        self.user.save()
         Payment.objects.create(
             order=self.order,
             yookassa_id="yoo_webhook_1",
@@ -93,6 +95,8 @@ class PaymentFlowTests(TestCase):
             Payment.objects.get(yookassa_id="yoo_webhook_1").status, "succeeded"
         )
         mock_mail.assert_called_once()
+        _, _, message = mock_mail.call_args[0]
+        self.assertIn("Привет Мария", message)
 
     @patch("apps.payments.views.send_notification")
     def test_payment_success_updates_status(self, mock_mail):
