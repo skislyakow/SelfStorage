@@ -1,7 +1,7 @@
 import re
 
 from django.core import mail
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 
 from apps.users.models import User
@@ -29,6 +29,21 @@ class RegistrationTests(TestCase):
         user = User.objects.get(email="new@test.ru")
         self.assertTrue(user.check_password("Str0ngPass!123"))
         self.assertTrue(user.pd_consent)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_register_sends_welcome_email(self):
+        data = {
+            "email": "welcome@test.ru",
+            "phone": "+79990000000",
+            "password1": "Str0ngPass!123",
+            "password2": "Str0ngPass!123",
+            "personal_data_consent": "on",
+        }
+        response = self.client.post(reverse("users:register"), data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["welcome@test.ru"])
+        self.assertIn("Добро пожаловать", mail.outbox[0].subject)
 
 
 class UserAdminTests(TestCase):
