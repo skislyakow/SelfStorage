@@ -19,7 +19,7 @@
             {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
           </div>
         {% else %}
-          <div class="mb-3">
+          <div class="mb-3{% if field.name == 'address' %}" style="display:none"{% endif %}">
             <label class="form-label SelfStorage_grey">{{ field.label }}</label>
             {{ field }}
             {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
@@ -43,8 +43,8 @@
     function toggleAddress() {
       var delivery = document.querySelector('input[name$="delivery_type"]:checked');
       var addr = document.querySelector('input[name$="address"]');
-      if (!delivery || !addr) return;
-      var show = delivery.value !== "self";
+      if (!addr) return;
+      var show = !!(delivery && delivery.value !== "self");
       addr.closest(".mb-3").style.display = show ? "" : "none";
       addr.required = show;
     }
