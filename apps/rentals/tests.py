@@ -55,7 +55,7 @@ class OrderWizardTests(TestCase):
             },
             r,
         )
-        r = self._post_step({}, r)
+
 
         self.assertEqual(RentalOrder.objects.count(), 1)
         order = RentalOrder.objects.get()
@@ -81,7 +81,7 @@ class OrderWizardTests(TestCase):
             },
             r,
         )
-        r = self._post_step({}, r)
+
 
         self.assertEqual(RentalOrder.objects.count(), 1)
         self.assertEqual(DeliveryRequest.objects.count(), 0)
@@ -110,7 +110,7 @@ class OrderWizardTests(TestCase):
             },
             r,
         )
-        r = self._post_step({}, r)
+
 
         self.assertEqual(r.status_code, 200)
         content = r.content.decode().lower()

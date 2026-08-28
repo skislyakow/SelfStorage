@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 
-from apps.rentals.forms import BoxForm, ContactsForm, DeliveryForm, SummaryForm
+from apps.rentals.forms import BoxForm, ContactsForm, DeliveryForm
 from apps.rentals.models import DeliveryRequest, RentalOrder
 from apps.warehouses.models import Box
 from apps.users.models import User
@@ -20,7 +20,7 @@ def add_months(start, months):
 
 
 class OrderWizard(LoginRequiredMixin, SessionWizardView):
-    form_list = [BoxForm, DeliveryForm, ContactsForm, SummaryForm]
+    form_list = [BoxForm, DeliveryForm, ContactsForm]
     template_name = "rentals/wizard.html"
 
     def get_form_initial(self, step):

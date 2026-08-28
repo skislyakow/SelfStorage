@@ -2,17 +2,39 @@
 {% block title %}Мастер заказа — SelfStorage{% endblock %}
 {% block content %}
 <div class="container py-5">
-  <h1>Мастер заказа — шаг {{ wizard.steps.step1 }} / {{ wizard.steps.count }}</h1>
-  <form method="post">{% csrf_token %}
-    {{ wizard.management_form }}
-    {{ wizard.form.as_p }}
-    {% if wizard.steps.prev %}
-      <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" class="btn btn-secondary" formnovalidate>Назад</button>
-    {% endif %}
-    <button type="submit" class="btn btn-primary">
-      {% if wizard.steps.next %}Далее{% else %}Оформить{% endif %}
-    </button>
-  </form>
+  <h1 class="mb-4 fw-bold">Мастер заказа — шаг {{ wizard.steps.step1 }} / {{ wizard.steps.count }}</h1>
+  <div class="mx-auto" style="max-width: 420px">
+    <form method="post" novalidate>{% csrf_token %}
+      {{ wizard.management_form }}
+      {% for field in wizard.form %}
+        {% if field.field.widget.input_type == 'radio' or field.field.widget.input_type == 'checkbox' %}
+          <div class="mb-3">
+            <label class="form-label SelfStorage_grey">{{ field.label }}</label>
+            {% for choice in field %}
+              <div class="form-check mb-2">
+                {{ choice.tag }}
+                <label class="form-check-label SelfStorage_grey" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+              </div>
+            {% endfor %}
+            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        {% else %}
+          <div class="mb-3">
+            <label class="form-label SelfStorage_grey">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        {% endif %}
+      {% endfor %}
+      <div class="d-flex gap-3 mt-4">
+        {% if wizard.steps.prev %}
+          <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" class="btn border-8 py-3 px-5 text-white fs_24 SelfStorage__bg_grey" formnovalidate>Назад</button>
+        {% endif %}
+        <button type="submit" class="btn border-8 py-3 px-5 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange">{% if wizard.steps.next %}Далее{% else %}Оформить{% endif %}</button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
 {% block scripts %}
@@ -23,7 +45,7 @@
       var addr = document.querySelector('input[name$="address"]');
       if (!delivery || !addr) return;
       var show = delivery.value !== "self";
-      addr.closest("p").style.display = show ? "" : "none";
+      addr.closest(".mb-3").style.display = show ? "" : "none";
       addr.required = show;
     }
     document.addEventListener("change", function (e) {
