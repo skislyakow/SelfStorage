@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<div class="row" role="tablist">
+	<div class="col-lg-3 d-flex flex-column nav nav-pills">
+		<button class="ps-0 btn bg-white fs_24 shadow-none SelfStorage_orange SelfStorage_tab active" id="LK-tab" data-bs-toggle="pill" data-bs-target="#LK" type="button" role="tab" aria-controls="LK" aria-selected="true">Личный кабинет</button>
+		<button class="ps-0 btn bg-white fs_24 shadow-none SelfStorage_grey SelfStorage_tab" id="Rent-tab" data-bs-toggle="pill" data-bs-target="#Rent" type="button" role="tab" aria-controls="Rent" aria-selected="false">Моя аренда</button>
+		<a href="{% url 'faq' %}" class="btn fs_24 shadow-none text-decoration-none SelfStorage_grey SelfStorage_tab">FAQ</a>
+		<a href="#" class="btn fs_24 shadow-none text-decoration-none SelfStorage_grey SelfStorage_tab">Выйти</a>
+	</div>
+	<div class="col-lg-9">
+		<div class="card tab-content p-5">
+			<div class="tab-pane fade show active" id="LK" role="tabpanel" aria-labelledby="LK-tab">
+				<div class="row">
+					<div class="col-12 col-sm-5 d-flex flex-column align-items-center">
+						<img src="{% static 'img/image10.png' %}" class="rounded-pill mb-3" alt="">
+						<h4>{{ user.first_name|default:"Пользователь" }}</h4>
+					</div>
+					<div class="col-12 col-sm-7 d-flex flex-column">
+						<form method="post" action="#">
+							{% csrf_token %}
+							<label class="fs_24 SelfStorage_green ms-2" for="EMAIL">E-mail</label>
+							<input type="email" name="email" id="EMAIL" class="form-control fs_24 ps-2 SelfStorage__input" value="{{ user.email }}" disabled>
+							<label class="fs_24 SelfStorage_green ms-2" for="PHONE">Телефон</label>
+							<input type="tel" name="phone" id="PHONE" class="form-control fs_24 ps-2 SelfStorage__input" value="{{ user.phone }}" disabled>
+							<label class="fs_24 SelfStorage_green ms-2" for="PASSWORD">Пароль</label>
+							<input type="password" name="password" id="PASSWORD" class="form-control fs_24 ps-2 SelfStorage__input" value="••••••••" disabled>
+							<button type="submit" class="btn SelfStorage_green ps-1" id="save" style="display: none">Сохранить</button>
+							<a class="btn SelfStorage_orange ps-1" id="edit">Редактировать</a>
+							<script>
+								document.getElementById('edit').addEventListener('click', e => {
+									e.preventDefault()
+									document.getElementById('EMAIL').disabled = false
+									document.getElementById('PHONE').disabled = false
+									document.getElementById('edit').style.display = 'none'
+									document.getElementById('save').style.display = 'inline-block'
+								})
+							</script>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane fade" id="Rent" role="tabpanel" aria-labelledby="Rent-tab">
+				<h1 class="fw-bold SelfStorage_green mb-4">Добрый день, {{ user.first_name|default:user.email }}!</h1>
+
+				{% if orders %}
+				{% for order in orders %}
+				<div class="mb-5 pb-4 {% if not forloop.last %}border-bottom{% endif %}">
+					<div class="d-flex justify-content-between align-items-start flex-wrap">
+						<h4 class="SelfStorage_green">Аренда №{{ order.pk }}</h4>
+						<span class="fs_24 {% if order.status == 'active' %}SelfStorage_green{% elif order.status == 'overdue' %}SelfStorage_orange{% else %}SelfStorage_grey{% endif %}">{{ order.get_status_display }}</span>
+					</div>
+
+					<h4 class="SelfStorage_green mt-3">Мой склад</h4>
+					<h4>{{ order.box.warehouse.city }}, {{ order.box.warehouse.address }}</h4>
+
+					<h4 class="SelfStorage_green mt-3">Мой бокс</h4>
+					<h4>№{{ order.box.number }}</h4>
+
+					{% if order.items_text %}
+					<h4 class="SelfStorage_green mt-3">Список вещей</h4>
+					<h4>{{ order.items_text }}</h4>
+					{% else %}
+					<h4 class="SelfStorage_green mt-3">Площадь</h4>
+					<h4>{{ order.box.area }} м²</h4>
+					{% endif %}
+
+					<h4 class="SelfStorage_green mt-3">Срок аренды</h4>
+					<h4>{{ order.start_date|date:"d.m.Y" }} - {{ order.end_date|date:"d.m.Y" }}</h4>
+
+					{% if order.amount %}
+					<h4 class="SelfStorage_green mt-3">Стоимость</h4>
+					<h4>{{ order.amount|floatformat:0 }} ₽</h4>
+					{% endif %}
+
+					{% if order.delivery %}
+					<h4 class="SelfStorage_green mt-3">Доставка</h4>
+					<h4>{{ order.delivery.get_status_display }}{% if order.delivery.client_address %} — {{ order.delivery.client_address }}{% endif %}</h4>
+					{% endif %}
+
+					<div class="mt-3">
+						{% if order.status == 'active' or order.status == 'overdue' %}
+						<div><button class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_green SelfStorage__btn2_green mb-3">Продлить аренду</button></div>
+						{% endif %}
+						{% if order.qr_code %}
+						<div><a href="{{ order.qr_code }}" class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange mb-3">Открыть бокс</a></div>
+						{% endif %}
+						<a href="#" class="SelfStorage_orange">Нужна помощь?</a>
+					</div>
+				</div>
+				{% endfor %}
+				{% else %}
+				<h4 class="SelfStorage_grey my-5">У вас еще нет аренды :(<br>Но вы можете арендовать свой первый бокс по привлекательной цене прямо сейчас</h4>
+				<div><a href="{% url 'warehouse_list' %}" class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange mb-3">Арендовать бокс</a></div>
+				<a href="#" class="SelfStorage_orange">Нужна помощь?</a>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
