@@ -6,6 +6,7 @@ from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.utils import timezone
+from django.views.generic import ListView
 from formtools.wizard.views import SessionWizardView
 
 from apps.promotions.models import PromoCode
@@ -125,4 +126,16 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
             self.request,
             "rentals/order_reserved.html",
             {"order": order, "promo": promo, "calc": calc},
+        )
+
+
+class MyRentView(LoginRequiredMixin, ListView):
+    template_name = "rentals/my_rent.html"
+    context_object_name = "orders"
+
+    def get_queryset(self):
+        return (
+            RentalOrder.objects.filter(user=self.request.user)
+            .select_related("box", "box__warehouse", "delivery")
+            .order_by("-start_date")
         )
