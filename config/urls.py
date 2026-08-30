@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.urls import include, path
 from config import views
 from config.admin_dashboard import owner_dashboard, send_notifications_now
+from django.contrib.auth.views import LoginView, LogoutView
 
 urlpatterns = [
     path("admin/owner-dashboard/", owner_dashboard, name="owner-dashboard"),
@@ -16,6 +17,8 @@ urlpatterns = [
     path("orders/", include("apps.rentals.urls")),
     path("accounts/", include("apps.users.urls")),
     path("", include("apps.payments.urls")),
+    path("login/", LoginView.as_view(template_name="registration/login.html"), name="login"),
+    path("logout/", LogoutView.as_view(), name="logout"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
