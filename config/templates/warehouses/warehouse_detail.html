@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ warehouse.city }}, {{ warehouse.address }}{% endblock %}
+
+{% block content %}
+<article class="pt-header">
+	<h1 class="text-center mb-4 fw-bold">{{ warehouse.city }}, {{ warehouse.address }}</h1>
+
+	<div class="row d-flex flex-column mb-5">
+		<div class="col-12 col-sm-6 col-lg-4 d-flex justify-content-between align-self-center">
+			{% if warehouse.contacts %}
+			<a type="button" class="SelfStorage_orange" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" title="Контакты" data-bs-content="{{ warehouse.contacts }}">
+				Контакты
+			</a>
+			{% endif %}
+			{% if warehouse.description %}
+			<a type="button" class="SelfStorage_orange" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" title="Описание" data-bs-content="{{ warehouse.description }}">
+				Описание
+			</a>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="row mb-5">
+		<div class="col-12 col-lg-6 d-flex justify-content-center">
+			{% if warehouse.photo %}
+			<img src="{{ warehouse.photo.url }}" alt="{{ warehouse.city }}" class="img-fluid rounded-8">
+			{% else %}
+			<img src="{% static 'img/image2.png' %}" alt="{{ warehouse.city }}" class="img-fluid rounded-8">
+			{% endif %}
+		</div>
+		<div class="col-12 col-lg-6">
+			<div class="row">
+				<div class="col-6 d-flex flex-column align-items-center align-items-lg-start">
+					{% if warehouse.temperature %}
+					<span class="fs_30 fw-bold SelfStorage_orange">{{ warehouse.temperature }}</span>
+					<span class="SelfStorage_grey mb-3">Температура на складе</span>
+					{% endif %}
+					<span class="fs_30 fw-bold SelfStorage_orange">{{ warehouse.boxes.count }}</span>
+					<span class="SelfStorage_grey mb-3">Всего боксов</span>
+				</div>
+				<div class="col-6 d-flex flex-column align-items-center align-items-lg-start">
+					{% if warehouse.ceiling_height %}
+					<span class="fs_30 fw-bold SelfStorage_orange">до {{ warehouse.ceiling_height }} м</span>
+					<span class="SelfStorage_grey mb-3">Высота потолка</span>
+					{% endif %}
+					<span class="fs_30 fw-bold SelfStorage_orange">{{ boxes|length }}</span>
+					<span class="SelfStorage_grey mb-3">Найдено по фильтру</span>
+				</div>
+				<div class="d-flex flex-column align-items-center align-items-lg-start">
+					<a href="#boxes-list" class="btn w-75 fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_green SelfStorage__btn2_green mb-3">Арендовать бокс</a>
+					<button class="btn w-75 fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange">Позвонить мне</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</article>
+
+<article class="pt-header" id="boxes-list">
+	<h2 class="text-center fw-bold mb-4">Боксы склада</h2>
+
+	<ul class="nav nav-pills mb-4 d-flex justify-content-between">
+		<li class="nav-item flex-grow-1 mx-2">
+			<a href="{% url 'warehouse_detail' warehouse.pk %}" class="btn my-2 w-100 fs_24 SelfStorage__tab{% if not filters.max_area and not filters.min_area %} active{% endif %}">Все боксы</a>
+		</li>
+		<li class="nav-item flex-grow-1 mx-2">
+			<a href="?max_area=3" class="btn my-2 w-100 fs_24 SelfStorage__tab{% if filters.max_area == 3.0 %} active{% endif %}">До 3 м²</a>
+		</li>
+		<li class="nav-item flex-grow-1 mx-2">
+			<a href="?max_area=10" class="btn my-2 w-100 fs_24 SelfStorage__tab{% if filters.max_area == 10.0 %} active{% endif %}">До 10 м²</a>
+		</li>
+		<li class="nav-item flex-grow-1 mx-2">
+			<a href="?min_area=10" class="btn my-2 w-100 fs_24 SelfStorage__tab{% if filters.min_area == 10.0 %} active{% endif %}">От 10 м²</a>
+		</li>
+	</ul>
+
+	{% if boxes %}
+	<div class="d-flex flex-column">
+		{% for box in boxes %}
+		<div class="row py-3 px-4 mt-3 SelfStorage__boxlink {% if box.status != 'free' %}opacity-50{% endif %}">
+			<div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
+				<span class="SelfStorage_green fs_24 me-2">{{ box.floor }} эт.</span><span class="fs_24">№{{ box.number }}</span>
+			</div>
+			<div class="col-6 col-md-4 col-lg-2 d-flex justify-content-center align-items-center">
+				<span class="fs_24">{{ box.area }} м²</span>
+			</div>
+			<div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
+				{% if box.length and box.width and box.height %}
+				<span class="fs_24">{{ box.length }} × {{ box.width }} × {{ box.height }} м</span>
+				{% endif %}
+			</div>
+			<div class="col-6 col-md-4 col-lg-2 d-flex justify-content-center align-items-center">
+				<span class="fs_24 {% if box.status == 'free' %}SelfStorage_green{% else %}SelfStorage_grey{% endif %}">{{ box.get_status_display }}</span>
+			</div>
+			<div class="col-12 col-lg-2">
+				{% if box.status == 'free' %}
+				{% if user.is_authenticated %}
+				<a href="{% url 'order_wizard' %}?box={{ box.pk }}" class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange border-8">От {{ box.price_per_month|floatformat:0 }} ₽</a>
+				{% else %}
+				<a href="#" data-bs-toggle="modal" data-bs-target="#SignModal" data-wizard-next="{% url 'order_wizard' %}?box={{ box.pk }}" class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange border-8">От {{ box.price_per_month|floatformat:0 }} ₽</a>
+				{% endif %}
+				{% else %}
+				<span class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_grey border-8 disabled">{{ box.price_per_month|floatformat:0 }} ₽</span>
+				{% endif %}
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+	{% else %}
+	<p class="text-center SelfStorage_grey">По этому фильтру боксов не нашлось — попробуйте другой диапазон.</p>
+	{% endif %}
+</article>
+<script>
+  document.querySelectorAll('[data-wizard-next]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var inp = document.querySelector('#SignModal input[name="next"]');
+      if (inp) inp.value = btn.getAttribute('data-wizard-next');
+    });
+  });
+</script>
+{% endblock %}

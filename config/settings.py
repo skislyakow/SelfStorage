@@ -34,6 +34,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.rentals.middleware.TrafficSourceMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -87,9 +88,21 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+# REG.RU требует, чтобы FROM был авторизованным ящиком (реальным), иначе
+# релей отклоняется с 451. Поэтому по умолчанию — реальный ящик, а не noreply@.
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="selfstorage@kislyakov.pro")
 
+# YooKassa (Юмани) — приём оплат за аренду боксов
+YOOKASSA_SHOP_ID = env("YOOKASSA_SHOP_ID", default="")
+YOOKASSA_SECRET_KEY = env("YOOKASSA_SECRET_KEY", default="")
+SITE_URL = env("SITE_URL", default="https://selfstorage.kislyakov.pro")
+
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
-
-LOGIN_URL = '/accounts/login/'
-
 LOGOUT_REDIRECT_URL = '/'

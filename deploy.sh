@@ -21,4 +21,10 @@ echo "=== seed demo data ==="
 echo "=== restart selftorage ==="
 systemctl restart selftorage
 
+echo "=== install reminder timer ==="
+cp selfstorage-notify.service /etc/systemd/system/
+cp selfstorage-notify.timer /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable --now selfstorage-notify.timer
+
 echo "Deploy OK"
