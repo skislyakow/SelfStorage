@@ -48,6 +48,9 @@ class RentalOrder(models.Model):
     traffic_source = models.CharField(
         "Метка источника трафика", max_length=100, blank=True, default=""
     )
+    qr_code = models.FileField(
+        "QR-код доступа к боксу", upload_to="qr/", blank=True, null=True
+    )
 
     class Meta:
         verbose_name = "Заказ аренды"

@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 
 from apps.warehouses.models import Warehouse, Box
 from apps.rentals.models import RentalOrder, DeliveryRequest
+from apps.rentals.services import generate_qr
 from apps.promotions.models import PromoCode
 from apps.payments.models import Payment
 
@@ -141,6 +142,9 @@ class Command(BaseCommand):
 
         Payment.objects.create(order=order1, yookassa_id=f"test_{order1.pk}", status="succeeded", amount=order1.amount)
         Payment.objects.create(order=order2, yookassa_id=f"test_{order2.pk}", status="succeeded", amount=order2.amount)
+
+        generate_qr(order1)
+        generate_qr(order2)
 
         DeliveryRequest.objects.create(
             order=order1,

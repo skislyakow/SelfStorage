@@ -20,6 +20,7 @@
 | `accounts:password_reset` | Сброс пароля | users | — |
 | `rentals:wizard` | Мастер заказа (4 шага) | rentals | — |
 | `profile:my_rent` | Личный кабинет | rentals | — |
+| `box-access/<pk>/` (`qr_access`) | QR-пропуск доступа к боксу | rentals | `pk` |
 | `owner:panel` | Панель владельца | rentals | — |
 
 ## 2. Переменные контекста шаблонов

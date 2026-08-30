@@ -4,9 +4,10 @@ from typing import cast
 
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 from django.shortcuts import render
 from django.utils import timezone
-from django.views.generic import ListView
+from django.views.generic import DetailView, ListView
 from formtools.wizard.views import SessionWizardView
 
 from apps.promotions.models import PromoCode
@@ -139,3 +140,17 @@ class MyRentView(LoginRequiredMixin, ListView):
             .select_related("box", "box__warehouse", "delivery")
             .order_by("-start_date")
         )
+
+
+class BoxAccessView(LoginRequiredMixin, DetailView):
+    """QR-пропуск: страница доступа к боксу для владельца заказа или персонала."""
+    model = RentalOrder
+    template_name = "rentals/qr_access.html"
+    context_object_name = "order"
+
+    def get_object(self, queryset=None):
+        order = super().get_object(queryset)
+        user = self.request.user
+        if order.user_id != user.id and not user.is_staff:
+            raise Http404
+        return order

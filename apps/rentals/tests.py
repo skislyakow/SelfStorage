@@ -237,3 +237,69 @@ class TrafficSourceMiddlewareTests(TestCase):
         c = Client()
         c.get(reverse("order_wizard"))
         self.assertNotIn("traffic_source", c.session)
+
+
+class BoxAccessTests(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(
+            email="owner@test.ru", password="pass1234"
+        )
+        self.staff = User.objects.create_user(
+            email="staff@test.ru", password="pass1234", is_staff=True
+        )
+        self.other = User.objects.create_user(
+            email="other@test.ru", password="pass1234"
+        )
+        self.wh = Warehouse.objects.create(city="Москва", address="ул. Тест, 1")
+        self.box = Box.objects.create(
+            warehouse=self.wh,
+            number="5",
+            area=5,
+            price_per_month=3000,
+            status="occupied",
+        )
+        self.order = RentalOrder.objects.create(
+            user=self.owner,
+            box=self.box,
+            start_date="2026-01-01",
+            end_date="2027-01-01",
+            status="active",
+            amount=3000,
+        )
+
+    def test_access_page_requires_login(self):
+        resp = self.client.get(reverse("qr_access", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 302)
+
+    def test_access_page_for_owner(self):
+        self.client.force_login(self.owner)
+        resp = self.client.get(reverse("qr_access", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, f"Бокс №{self.box.number}")
+
+    def test_access_page_for_staff(self):
+        self.client.force_login(self.staff)
+        resp = self.client.get(reverse("qr_access", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "QR-пропуск")
+
+    def test_access_page_forbidden_for_other(self):
+        self.client.force_login(self.other)
+        resp = self.client.get(reverse("qr_access", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 404)
+
+    def test_my_rent_shows_qr_when_present(self):
+        self.order.qr_code = "qr/qr_x.png"
+        self.order.save()
+        self.client.force_login(self.owner)
+        resp = self.client.get(reverse("my_rent"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Открыть бокс")
+        self.assertContains(resp, "/media/qr/qr_x.png")
+
+    def test_my_rent_hides_qr_when_absent(self):
+        self.client.force_login(self.owner)
+        resp = self.client.get(reverse("my_rent"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotContains(resp, "Открыть бокс")
+        self.assertNotContains(resp, "/media/qr/")

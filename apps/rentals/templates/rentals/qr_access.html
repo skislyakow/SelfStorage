@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}QR-пропуск — бокс №{{ order.box.number }}{% endblock %}
+{% block content %}
+<div class="container py-5 text-center">
+  <h1 class="mb-4">QR-пропуск — доступ к боксу</h1>
+  <p class="fs-5">Заказ №{{ order.pk }}</p>
+  <p class="fs-5">Клиент: {{ order.user.first_name|default:order.user.email }} {% if order.user.phone %}({{ order.user.phone }}){% endif %}</p>
+  <p class="fs-5">Склад: {{ order.box.warehouse.city }}, {{ order.box.warehouse.address }}</p>
+  <p class="fs-5">Бокс №{{ order.box.number }} ({{ order.box.area }} м²)</p>
+  <p class="fs-5">Срок: с {{ order.start_date|date:"d.m.Y" }} по {{ order.end_date|date:"d.m.Y" }}</p>
+  <p class="fs-5">Статус: {{ order.get_status_display }}</p>
+
+  {% if order.qr_code %}
+  <p class="mt-4">Покажите этот QR-код при доступе к боксу:</p>
+  <img src="{{ order.qr_code.url }}" alt="QR-код доступа к боксу {{ order.box.number }}" style="width:220px;height:220px;" class="border border-3 rounded p-2">
+  {% else %}
+  <p class="text-muted mt-4">QR-код появится после оплаты заказа.</p>
+  {% endif %}
+
+  <p class="mt-4"><a href="{% url 'my_rent' %}">Вернуться в личный кабинет</a></p>
+</div>
+{% endblock %}
