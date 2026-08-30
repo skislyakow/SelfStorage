@@ -85,9 +85,10 @@
 						{% if order.status == 'active' or order.status == 'overdue' %}
 						<div><button class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_green SelfStorage__btn2_green mb-3">Продлить аренду</button></div>
 						{% endif %}
-						{% if order.qr_code %}
-						<div><a href="{{ order.qr_code }}" class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange mb-3">Открыть бокс</a></div>
-						{% endif %}
+					{% if order.qr_code %}
+					<div><a href="{% url 'qr_access' order.pk %}" class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange mb-3">Открыть бокс</a></div>
+					<div class="mt-2"><img src="{{ order.qr_code.url }}" width="120" height="120" alt="QR-код доступа к боксу {{ order.box.number }}" class="border border-3 rounded p-1"></div>
+					{% endif %}
 						<a href="#" class="SelfStorage_orange">Нужна помощь?</a>
 					</div>
 				</div>

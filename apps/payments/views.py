@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -11,7 +12,11 @@ from yookassa import Configuration, Payment as YooPayment
 from apps.notifications.email import greeting, send_notification
 from apps.payments.models import Payment
 from apps.rentals.models import RentalOrder
+from apps.rentals.services import generate_qr
 from apps.warehouses.models import Box
+
+
+logger = logging.getLogger(__name__)
 
 
 def _configure_yookassa():
@@ -107,6 +112,10 @@ def _mark_paid(payment, order):
     if order.status != "active":
         order.status = "active"
         order.save()
+        try:
+            generate_qr(order)
+        except Exception:
+            logger.exception("Не удалось сгенерировать QR-код для заказа %s", order.id)
         box = order.box
         if box.status != "occupied":
             box.status = "occupied"
