@@ -9,6 +9,7 @@
   <p class="fs-5">Бокс №{{ order.box.number }} ({{ order.box.area }} м²)</p>
   <p class="fs-5">Срок: с {{ order.start_date|date:"d.m.Y" }} по {{ order.end_date|date:"d.m.Y" }}</p>
   <p class="fs-5">Статус: {{ order.get_status_display }}</p>
+  <p class="fs-5">Статус бокса: {% if order.access_status == 'open' %}Открыт{% else %}Закрыт{% endif %}</p>
 
   {% if order.qr_code %}
   <p class="mt-4">Покажите этот QR-код при доступе к боксу:</p>

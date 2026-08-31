@@ -290,16 +290,66 @@ class BoxAccessTests(TestCase):
 
     def test_my_rent_shows_qr_when_present(self):
         self.order.qr_code = "qr/qr_x.png"
+        self.order.access_status = "open"
         self.order.save()
         self.client.force_login(self.owner)
         resp = self.client.get(reverse("my_rent"))
         self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, "Открыть бокс")
+        self.assertContains(resp, "Закрыть бокс")
         self.assertContains(resp, "/media/qr/qr_x.png")
 
     def test_my_rent_hides_qr_when_absent(self):
         self.client.force_login(self.owner)
         resp = self.client.get(reverse("my_rent"))
         self.assertEqual(resp.status_code, 200)
-        self.assertNotContains(resp, "Открыть бокс")
         self.assertNotContains(resp, "/media/qr/")
+
+    def test_box_open_requires_login(self):
+        resp = self.client.post(reverse("box_open", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 302)
+
+    def test_box_open_for_owner_sets_open(self):
+        self.client.force_login(self.owner)
+        resp = self.client.post(reverse("box_open", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 302)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.access_status, "open")
+
+    def test_box_close_for_owner_sets_closed(self):
+        self.order.access_status = "open"
+        self.order.save()
+        self.client.force_login(self.owner)
+        resp = self.client.post(reverse("box_close", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 302)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.access_status, "closed")
+
+    def test_box_open_forbidden_for_other(self):
+        self.client.force_login(self.other)
+        resp = self.client.post(reverse("box_open", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 404)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.access_status, "closed")
+
+    def test_box_open_blocked_when_not_active(self):
+        self.order.status = "finished"
+        self.order.save()
+        self.client.force_login(self.owner)
+        resp = self.client.post(reverse("box_open", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 302)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.access_status, "closed")
+
+    def test_my_rent_shows_close_when_open(self):
+        self.order.access_status = "open"
+        self.order.save()
+        self.client.force_login(self.owner)
+        resp = self.client.get(reverse("my_rent"))
+        self.assertContains(resp, "Закрыть бокс")
+
+    def test_my_rent_hides_open_when_not_active(self):
+        self.order.status = "overdue"
+        self.order.save()
+        self.client.force_login(self.owner)
+        resp = self.client.get(reverse("my_rent"))
+        self.assertNotContains(resp, "Открыть бокс")

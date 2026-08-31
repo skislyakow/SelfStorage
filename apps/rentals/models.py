@@ -51,6 +51,13 @@ class RentalOrder(models.Model):
     qr_code = models.FileField(
         "QR-код доступа к боксу", upload_to="qr/", blank=True, null=True
     )
+    ACCESS_CHOICES = [
+        ("closed", "Закрыт"),
+        ("open", "Открыт"),
+    ]
+    access_status = models.CharField(
+        "Статус бокса", max_length=10, choices=ACCESS_CHOICES, default="closed"
+    )
 
     class Meta:
         verbose_name = "Заказ аренды"

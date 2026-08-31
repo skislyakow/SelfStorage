@@ -3,9 +3,10 @@ from datetime import date
 from typing import cast
 
 from decimal import Decimal
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.generic import DetailView, ListView
 from formtools.wizard.views import SessionWizardView
@@ -141,6 +142,13 @@ class MyRentView(LoginRequiredMixin, ListView):
             .order_by("-start_date")
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        error = self.request.session.pop("box_access_error", None)
+        if error:
+            context["box_access_error"] = error
+        return context
+
 
 class BoxAccessView(LoginRequiredMixin, DetailView):
     """QR-пропуск: страница доступа к боксу для владельца заказа или персонала."""
@@ -154,3 +162,30 @@ class BoxAccessView(LoginRequiredMixin, DetailView):
         if order.user_id != user.id and not user.is_staff:
             raise Http404
         return order
+
+
+@login_required
+def box_open(request, pk):
+    """Открыть бокс (заглушка логики): собственник и активная аренда."""
+    order = get_object_or_404(RentalOrder, pk=pk)
+    if order.user_id != request.user.id:
+        raise Http404
+    if order.status != "active":
+        request.session["box_access_error"] = (
+            f"Нельзя открыть бокс: срок аренды №{pk} истёк или аренда не активна."
+        )
+        return redirect("my_rent")
+    order.access_status = "open"
+    order.save(update_fields=["access_status"])
+    return redirect("my_rent")
+
+
+@login_required
+def box_close(request, pk):
+    """Закрыть бокс (заглушка логики): собственник."""
+    order = get_object_or_404(RentalOrder, pk=pk)
+    if order.user_id != request.user.id:
+        raise Http404
+    order.access_status = "closed"
+    order.save(update_fields=["access_status"])
+    return redirect("my_rent")

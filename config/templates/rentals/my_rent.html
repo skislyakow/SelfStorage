@@ -46,6 +46,10 @@
 			<div class="tab-pane fade" id="Rent" role="tabpanel" aria-labelledby="Rent-tab">
 				<h1 class="fw-bold SelfStorage_green mb-4">Добрый день, {{ user.first_name|default:user.email }}!</h1>
 
+				{% if box_access_error %}
+				<div class="alert alert-danger py-3 fs_24" role="alert">{{ box_access_error }}</div>
+				{% endif %}
+
 				{% if orders %}
 				{% for order in orders %}
 				<div class="mb-5 pb-4 {% if not forloop.last %}border-bottom{% endif %}">
@@ -85,10 +89,24 @@
 						{% if order.status == 'active' or order.status == 'overdue' %}
 						<div><button class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_green SelfStorage__btn2_green mb-3">Продлить аренду</button></div>
 						{% endif %}
-					{% if order.qr_code %}
-					<div><a href="{% url 'qr_access' order.pk %}" class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange mb-3">Открыть бокс</a></div>
-					<div class="mt-2"><img src="{{ order.qr_code.url }}" width="120" height="120" alt="QR-код доступа к боксу {{ order.box.number }}" class="border border-3 rounded p-1"></div>
-					{% endif %}
+
+						{% if order.status == 'active' %}
+							{% if order.access_status == 'open' %}
+							<div class="mb-2"><span class="fs_24 SelfStorage_green">Бокс открыт</span></div>
+							{% if order.qr_code %}
+							<div><img src="{{ order.qr_code.url }}" width="120" height="120" alt="QR-код доступа к боксу {{ order.box.number }}" class="border border-3 rounded p-1 mb-2"></div>
+							{% endif %}
+							<form method="post" action="{% url 'box_close' order.pk %}">{% csrf_token %}
+								<button type="submit" class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_grey SelfStorage__btn2_green mb-3">Закрыть бокс</button>
+							</form>
+							{% else %}
+							<form method="post" action="{% url 'box_open' order.pk %}">{% csrf_token %}
+								<button type="submit" class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange mb-3">Открыть бокс</button>
+							</form>
+							{% endif %}
+						{% elif order.status == 'overdue' or order.status == 'finished' %}
+						<div class="fs_24 SelfStorage_orange mb-2">Срок аренды истёк — бокс недоступен</div>
+						{% endif %}
 						<a href="#" class="SelfStorage_orange">Нужна помощь?</a>
 					</div>
 				</div>
