@@ -93,16 +93,16 @@
 						{% if order.status == 'active' %}
 							{% if order.access_status == 'open' %}
 							<div class="mb-2"><span class="fs_24 SelfStorage_green">Бокс открыт</span></div>
-							{% if order.qr_code %}
-							<div><img src="{{ order.qr_code.url }}" width="120" height="120" alt="QR-код доступа к боксу {{ order.box.number }}" class="border border-3 rounded p-1 mb-2"></div>
-							{% endif %}
 							<form method="post" action="{% url 'box_close' order.pk %}">{% csrf_token %}
 								<button type="submit" class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_grey SelfStorage__btn2_green mb-3">Закрыть бокс</button>
 							</form>
 							{% else %}
-							<form method="post" action="{% url 'box_open' order.pk %}">{% csrf_token %}
-								<button type="submit" class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange mb-3">Открыть бокс</button>
-							</form>
+							<p class="fs_24 mb-1">Наведите камеру телефона на QR-код, чтобы открыть бокс.</p>
+							{% if order.qr_code %}
+							<div class="mb-3"><img src="{{ order.qr_code.url }}" width="140" height="140" alt="QR-код доступа к боксу {{ order.box.number }}" class="border border-3 rounded p-1"></div>
+							{% else %}
+							<p class="fs_24 SelfStorage_grey mb-3">QR-код появится после оплаты заказа.</p>
+							{% endif %}
 							{% endif %}
 						{% elif order.status == 'overdue' or order.status == 'finished' %}
 						<div class="fs_24 SelfStorage_orange mb-2">Срок аренды истёк — бокс недоступен</div>

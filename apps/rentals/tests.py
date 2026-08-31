@@ -244,12 +244,6 @@ class BoxAccessTests(TestCase):
         self.owner = User.objects.create_user(
             email="owner@test.ru", password="pass1234"
         )
-        self.staff = User.objects.create_user(
-            email="staff@test.ru", password="pass1234", is_staff=True
-        )
-        self.other = User.objects.create_user(
-            email="other@test.ru", password="pass1234"
-        )
         self.wh = Warehouse.objects.create(city="Москва", address="ул. Тест, 1")
         self.box = Box.objects.create(
             warehouse=self.wh,
@@ -267,89 +261,65 @@ class BoxAccessTests(TestCase):
             amount=3000,
         )
 
-    def test_access_page_requires_login(self):
+    def test_access_page_open_by_qr_without_login(self):
         resp = self.client.get(reverse("qr_access", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 200)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.access_status, "open")
+        self.assertContains(resp, "Бокс открыт")
+        self.assertContains(resp, "Закрыть бокс")
+
+    def test_access_page_does_not_open_when_not_active(self):
+        self.order.status = "finished"
+        self.order.save()
+        resp = self.client.get(reverse("qr_access", args=[self.order.pk]))
+        self.assertEqual(resp.status_code, 200)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.access_status, "closed")
+        self.assertContains(resp, "бокс недоступен")
+
+    def test_box_close_without_login_sets_closed(self):
+        self.order.access_status = "open"
+        self.order.save()
+        resp = self.client.post(reverse("box_close", args=[self.order.pk]))
         self.assertEqual(resp.status_code, 302)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.access_status, "closed")
 
-    def test_access_page_for_owner(self):
+    def test_box_close_by_owner_redirects_to_my_rent(self):
         self.client.force_login(self.owner)
-        resp = self.client.get(reverse("qr_access", args=[self.order.pk]))
+        resp = self.client.post(reverse("box_close", args=[self.order.pk]), follow=True)
+        self.assertRedirects(resp, reverse("my_rent"))
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.access_status, "closed")
+
+    def test_my_rent_shows_qr_and_hint_when_closed(self):
+        self.order.qr_code = "qr/qr_x.png"
+        self.order.save()
+        self.client.force_login(self.owner)
+        resp = self.client.get(reverse("my_rent"))
         self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, f"Бокс №{self.box.number}")
+        self.assertContains(resp, "/media/qr/qr_x.png")
+        self.assertContains(resp, "Наведите камеру телефона")
+        self.assertNotContains(resp, "Открыть бокс")
 
-    def test_access_page_for_staff(self):
-        self.client.force_login(self.staff)
-        resp = self.client.get(reverse("qr_access", args=[self.order.pk]))
-        self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, "QR-пропуск")
-
-    def test_access_page_forbidden_for_other(self):
-        self.client.force_login(self.other)
-        resp = self.client.get(reverse("qr_access", args=[self.order.pk]))
-        self.assertEqual(resp.status_code, 404)
-
-    def test_my_rent_shows_qr_when_present(self):
+    def test_my_rent_hides_qr_when_open(self):
         self.order.qr_code = "qr/qr_x.png"
         self.order.access_status = "open"
         self.order.save()
         self.client.force_login(self.owner)
         resp = self.client.get(reverse("my_rent"))
         self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Бокс открыт")
         self.assertContains(resp, "Закрыть бокс")
-        self.assertContains(resp, "/media/qr/qr_x.png")
-
-    def test_my_rent_hides_qr_when_absent(self):
-        self.client.force_login(self.owner)
-        resp = self.client.get(reverse("my_rent"))
-        self.assertEqual(resp.status_code, 200)
         self.assertNotContains(resp, "/media/qr/")
 
-    def test_box_open_requires_login(self):
-        resp = self.client.post(reverse("box_open", args=[self.order.pk]))
-        self.assertEqual(resp.status_code, 302)
-
-    def test_box_open_for_owner_sets_open(self):
-        self.client.force_login(self.owner)
-        resp = self.client.post(reverse("box_open", args=[self.order.pk]))
-        self.assertEqual(resp.status_code, 302)
-        self.order.refresh_from_db()
-        self.assertEqual(self.order.access_status, "open")
-
-    def test_box_close_for_owner_sets_closed(self):
-        self.order.access_status = "open"
-        self.order.save()
-        self.client.force_login(self.owner)
-        resp = self.client.post(reverse("box_close", args=[self.order.pk]))
-        self.assertEqual(resp.status_code, 302)
-        self.order.refresh_from_db()
-        self.assertEqual(self.order.access_status, "closed")
-
-    def test_box_open_forbidden_for_other(self):
-        self.client.force_login(self.other)
-        resp = self.client.post(reverse("box_open", args=[self.order.pk]))
-        self.assertEqual(resp.status_code, 404)
-        self.order.refresh_from_db()
-        self.assertEqual(self.order.access_status, "closed")
-
-    def test_box_open_blocked_when_not_active(self):
-        self.order.status = "finished"
-        self.order.save()
-        self.client.force_login(self.owner)
-        resp = self.client.post(reverse("box_open", args=[self.order.pk]))
-        self.assertEqual(resp.status_code, 302)
-        self.order.refresh_from_db()
-        self.assertEqual(self.order.access_status, "closed")
-
-    def test_my_rent_shows_close_when_open(self):
-        self.order.access_status = "open"
-        self.order.save()
-        self.client.force_login(self.owner)
-        resp = self.client.get(reverse("my_rent"))
-        self.assertContains(resp, "Закрыть бокс")
-
-    def test_my_rent_hides_open_when_not_active(self):
+    def test_my_rent_hides_qr_when_not_active(self):
+        self.order.qr_code = "qr/qr_x.png"
         self.order.status = "overdue"
         self.order.save()
         self.client.force_login(self.owner)
         resp = self.client.get(reverse("my_rent"))
-        self.assertNotContains(resp, "Открыть бокс")
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotContains(resp, "/media/qr/")
+        self.assertContains(resp, "бокс недоступен")

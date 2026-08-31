@@ -3,9 +3,7 @@ from datetime import date
 from typing import cast
 
 from decimal import Decimal
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.generic import DetailView, ListView
@@ -150,42 +148,29 @@ class MyRentView(LoginRequiredMixin, ListView):
         return context
 
 
-class BoxAccessView(LoginRequiredMixin, DetailView):
-    """QR-пропуск: страница доступа к боксу для владельца заказа или персонала."""
+class BoxAccessView(DetailView):
+    """QR-доступ: переход по QR открывает бокс (заглушка логики).
+
+    Доступно по ссылке/QR любому, у кого есть QR (семья, охрана). Открытие
+    возможно только при активной аренде (срок не вышел).
+    """
     model = RentalOrder
     template_name = "rentals/qr_access.html"
     context_object_name = "order"
 
-    def get_object(self, queryset=None):
-        order = super().get_object(queryset)
-        user = self.request.user
-        if order.user_id != user.id and not user.is_staff:
-            raise Http404
-        return order
+    def get(self, request, *args, **kwargs):
+        order = self.get_object()
+        if order.status == "active" and order.access_status != "open":
+            order.access_status = "open"
+            order.save(update_fields=["access_status"])
+        return super().get(request, *args, **kwargs)
 
 
-@login_required
-def box_open(request, pk):
-    """Открыть бокс (заглушка логики): собственник и активная аренда."""
-    order = get_object_or_404(RentalOrder, pk=pk)
-    if order.user_id != request.user.id:
-        raise Http404
-    if order.status != "active":
-        request.session["box_access_error"] = (
-            f"Нельзя открыть бокс: срок аренды №{pk} истёк или аренда не активна."
-        )
-        return redirect("my_rent")
-    order.access_status = "open"
-    order.save(update_fields=["access_status"])
-    return redirect("my_rent")
-
-
-@login_required
 def box_close(request, pk):
-    """Закрыть бокс (заглушка логики): собственник."""
+    """Закрыть бокс (заглушка логики): любой, кому доступен бокс."""
     order = get_object_or_404(RentalOrder, pk=pk)
-    if order.user_id != request.user.id:
-        raise Http404
     order.access_status = "closed"
     order.save(update_fields=["access_status"])
-    return redirect("my_rent")
+    if request.user.is_authenticated:
+        return redirect("my_rent")
+    return redirect("qr_access", pk=pk)
