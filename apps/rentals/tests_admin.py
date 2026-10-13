@@ -1,6 +1,5 @@
-from django.test import TestCase, Client
-
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 
 from apps.rentals.models import DeliveryRequest
 

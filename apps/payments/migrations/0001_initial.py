@@ -4,24 +4,59 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Payment',
+            name="Payment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('yookassa_id', models.CharField(blank=True, default='', max_length=100, verbose_name='Идентификатор платежа ЮKassa')),
-                ('status', models.CharField(choices=[('pending', 'Ожидает'), ('succeeded', 'Успешно'), ('canceled', 'Отменён')], default='pending', max_length=20, verbose_name='Статус')),
-                ('amount', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='Сумма, ₽')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "yookassa_id",
+                    models.CharField(
+                        blank=True,
+                        default="",
+                        max_length=100,
+                        verbose_name="Идентификатор платежа ЮKassa",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Ожидает"),
+                            ("succeeded", "Успешно"),
+                            ("canceled", "Отменён"),
+                        ],
+                        default="pending",
+                        max_length=20,
+                        verbose_name="Статус",
+                    ),
+                ),
+                (
+                    "amount",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=2,
+                        max_digits=10,
+                        null=True,
+                        verbose_name="Сумма, ₽",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Платёж',
-                'verbose_name_plural': 'Платежи',
+                "verbose_name": "Платёж",
+                "verbose_name_plural": "Платежи",
             },
         ),
     ]

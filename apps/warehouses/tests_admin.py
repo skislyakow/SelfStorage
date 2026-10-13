@@ -1,8 +1,7 @@
 from datetime import date
 
-from django.test import TestCase, Client
-
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 
 User = get_user_model()
 
@@ -43,4 +42,6 @@ class BoxAdminTests(TestCase):
         self.assertEqual(admin.first_name, "Администратор")
         ira = User.objects.get(email="ira@mail.ru")
         self.assertEqual(ira.first_name, "Ира")
-        self.assertEqual(User.objects.exclude(first_name="").count(), User.objects.count())
+        self.assertEqual(
+            User.objects.exclude(first_name="").count(), User.objects.count()
+        )

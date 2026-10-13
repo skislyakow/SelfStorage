@@ -1,5 +1,5 @@
-from io import BytesIO
 import os
+from io import BytesIO
 
 import qrcode
 from django.conf import settings

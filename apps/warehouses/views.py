@@ -8,13 +8,9 @@ def warehouse_list(request):
     warehouses = Warehouse.objects.annotate(
         total_count=Count("boxes"),
         free_count=Count("boxes", filter=Q(boxes__status="free")),
-        min_price=Min(
-            "boxes__price_per_month", filter=Q(boxes__status="free")
-        ),
+        min_price=Min("boxes__price_per_month", filter=Q(boxes__status="free")),
     )
-    return render(
-        request, "warehouses/warehouse_list.html", {"warehouses": warehouses}
-    )
+    return render(request, "warehouses/warehouse_list.html", {"warehouses": warehouses})
 
 
 def warehouse_detail(request, pk):

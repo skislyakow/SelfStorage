@@ -6,23 +6,32 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('rentals', '0001_initial'),
+        ("rentals", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='rentalorder',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='orders', to=settings.AUTH_USER_MODEL, verbose_name='Пользователь'),
+            model_name="rentalorder",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="orders",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Пользователь",
+            ),
         ),
         migrations.AddField(
-            model_name='deliveryrequest',
-            name='order',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='delivery', to='rentals.rentalorder', verbose_name='Заказ'),
+            model_name="deliveryrequest",
+            name="order",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="delivery",
+                to="rentals.rentalorder",
+                verbose_name="Заказ",
+            ),
         ),
     ]

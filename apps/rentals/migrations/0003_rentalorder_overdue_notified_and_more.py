@@ -4,20 +4,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('rentals', '0002_initial'),
+        ("rentals", "0002_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='rentalorder',
-            name='overdue_notified',
-            field=models.BooleanField(default=False, verbose_name='Письмо о просрочке отправлено'),
+            model_name="rentalorder",
+            name="overdue_notified",
+            field=models.BooleanField(
+                default=False, verbose_name="Письмо о просрочке отправлено"
+            ),
         ),
         migrations.AlterField(
-            model_name='deliveryrequest',
-            name='client_address',
-            field=models.CharField(blank=True, default='', help_text='Откуда курьер забирает вещи (адрес клиента)', max_length=255, verbose_name='Адрес забора у клиента'),
+            model_name="deliveryrequest",
+            name="client_address",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Откуда курьер забирает вещи (адрес клиента)",
+                max_length=255,
+                verbose_name="Адрес забора у клиента",
+            ),
         ),
     ]

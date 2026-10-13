@@ -1,7 +1,7 @@
 import re
 
 from django.core import mail
-from django.test import TestCase, Client, override_settings
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from apps.users.models import User
@@ -49,9 +49,7 @@ class RegistrationTests(TestCase):
         self.assertIn("Добро пожаловать", mail.outbox[0].subject)
         self.assertIn("Привет", mail.outbox[0].body)
         self.assertNotIn("Уважаемый(ая)", mail.outbox[0].body)
-        self.assertEqual(
-            User.objects.get(email="welcome@test.ru").first_name, "Привет"
-        )
+        self.assertEqual(User.objects.get(email="welcome@test.ru").first_name, "Привет")
 
 
 class UserAdminTests(TestCase):
@@ -77,10 +75,13 @@ class UserAdminTests(TestCase):
 class LoginLogoutTests(TestCase):
     def test_login_logs_in_user(self):
         User.objects.create_user(email="login@test.ru", password="Str0ngPass!123")
-        response = self.client.post(reverse("users:login"), {
-            "username": "login@test.ru",
-            "password": "Str0ngPass!123",
-        })
+        response = self.client.post(
+            reverse("users:login"),
+            {
+                "username": "login@test.ru",
+                "password": "Str0ngPass!123",
+            },
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response["Location"], reverse("home"))
         self.assertIn("_auth_user_id", self.client.session)
@@ -118,12 +119,17 @@ class PasswordResetTests(TestCase):
         resp_form = client.get(set_password_url)
         self.assertEqual(resp_form.status_code, 200)
 
-        resp_post = client.post(set_password_url, {
-            "new_password1": "NewStr0ng!456",
-            "new_password2": "NewStr0ng!456",
-        })
+        resp_post = client.post(
+            set_password_url,
+            {
+                "new_password1": "NewStr0ng!456",
+                "new_password2": "NewStr0ng!456",
+            },
+        )
         self.assertEqual(resp_post.status_code, 302)
-        self.assertEqual(resp_post["Location"], reverse("users:password_reset_complete"))
+        self.assertEqual(
+            resp_post["Location"], reverse("users:password_reset_complete")
+        )
 
         user = User.objects.get(email="reset@test.ru")
         self.assertTrue(user.check_password("NewStr0ng!456"))

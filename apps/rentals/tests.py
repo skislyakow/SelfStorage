@@ -2,14 +2,14 @@ import re
 from datetime import timedelta
 from decimal import Decimal
 
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
 from apps.promotions.models import PromoCode
 from apps.rentals.models import DeliveryRequest, RentalOrder
-from apps.warehouses.models import Box, Warehouse
 from apps.users.models import User
+from apps.warehouses.models import Box, Warehouse
 
 
 class OrderWizardTests(TestCase):
@@ -28,9 +28,7 @@ class OrderWizardTests(TestCase):
         self.client = Client(SERVER_NAME="localhost")
 
     def _management(self, html):
-        m = re.search(
-            r'name="order_wizard-current_step" value="([^"]*)"', html
-        )
+        m = re.search(r'name="order_wizard-current_step" value="([^"]*)"', html)
         return {"order_wizard-current_step": m.group(1) if m else ""}
 
     def _post_step(self, data, prev_response):
@@ -41,9 +39,7 @@ class OrderWizardTests(TestCase):
     def test_wizard_creates_order_and_delivery(self):
         self.client.login(email="wizard@test.ru", password="pass1234")
         r = self.client.get(reverse("order_wizard"))
-        r = self._post_step(
-            {"0-box": str(self.box.pk), "0-rental_months": "3"}, r
-        )
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "3"}, r)
         r = self._post_step(
             {
                 "1-delivery_type": "delivery",
@@ -55,11 +51,9 @@ class OrderWizardTests(TestCase):
             {
                 "2-first_name": "Имя",
                 "2-phone": "79990000000",
-                
             },
             r,
         )
-
 
         self.assertEqual(RentalOrder.objects.count(), 1)
         order = RentalOrder.objects.get()
@@ -73,19 +67,15 @@ class OrderWizardTests(TestCase):
     def test_wizard_self_pickup_no_delivery(self):
         self.client.login(email="wizard@test.ru", password="pass1234")
         r = self.client.get(reverse("order_wizard"))
-        r = self._post_step(
-            {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
-        )
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "1"}, r)
         r = self._post_step({"1-delivery_type": "self"}, r)
         r = self._post_step(
             {
                 "2-first_name": "Имя",
                 "2-phone": "79990000000",
-                
             },
             r,
         )
-
 
         self.assertEqual(RentalOrder.objects.count(), 1)
         self.assertEqual(DeliveryRequest.objects.count(), 0)
@@ -100,21 +90,15 @@ class OrderWizardTests(TestCase):
     def test_wizard_completes_with_confirmation_and_reserves(self):
         self.client.login(email="wizard@test.ru", password="pass1234")
         r = self.client.get(reverse("order_wizard") + f"?box={self.box.pk}")
-        r = self._post_step(
-            {"0-box": str(self.box.pk), "0-rental_months": "3"}, r
-        )
-        r = self._post_step(
-            {"1-delivery_type": "delivery", "1-address": "ул. Тест"}, r
-        )
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "3"}, r)
+        r = self._post_step({"1-delivery_type": "delivery", "1-address": "ул. Тест"}, r)
         r = self._post_step(
             {
                 "2-first_name": "Имя",
                 "2-phone": "79990000000",
-                
             },
             r,
         )
-
 
         self.assertEqual(r.status_code, 200)
         content = r.content.decode().lower()
@@ -131,9 +115,7 @@ class OrderWizardTests(TestCase):
         self.user.save()
         self.client.login(email="wizard@test.ru", password="pass1234")
         r = self.client.get(reverse("order_wizard"))
-        r = self._post_step(
-            {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
-        )
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "1"}, r)
         r = self._post_step({"1-delivery_type": "self"}, r)
         content = r.content.decode()
         self.assertIn('value="Пётр"', content)
@@ -149,9 +131,7 @@ class OrderWizardTests(TestCase):
         )
         self.client.login(email="wizard@test.ru", password="pass1234")
         r = self.client.get(reverse("order_wizard") + f"?box={self.box.pk}")
-        r = self._post_step(
-            {"0-box": str(self.box.pk), "0-rental_months": "3"}, r
-        )
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "3"}, r)
         r = self._post_step({"1-delivery_type": "self"}, r)
         r = self._post_step(
             {
@@ -172,9 +152,7 @@ class OrderWizardTests(TestCase):
     def test_wizard_invalid_promo_blocks(self):
         self.client.login(email="wizard@test.ru", password="pass1234")
         r = self.client.get(reverse("order_wizard") + f"?box={self.box.pk}")
-        r = self._post_step(
-            {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
-        )
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "1"}, r)
         r = self._post_step({"1-delivery_type": "self"}, r)
         r = self._post_step(
             {
@@ -190,9 +168,7 @@ class OrderWizardTests(TestCase):
     def test_wizard_captures_traffic_source(self):
         self.client.login(email="wizard@test.ru", password="pass1234")
         r = self.client.get(reverse("order_wizard") + "?utm_source=facebook")
-        r = self._post_step(
-            {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
-        )
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "1"}, r)
         r = self._post_step({"1-delivery_type": "self"}, r)
         r = self._post_step(
             {
@@ -207,9 +183,7 @@ class OrderWizardTests(TestCase):
     def test_wizard_without_traffic_source_is_empty(self):
         self.client.login(email="wizard@test.ru", password="pass1234")
         r = self.client.get(reverse("order_wizard"))
-        r = self._post_step(
-            {"0-box": str(self.box.pk), "0-rental_months": "1"}, r
-        )
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "1"}, r)
         r = self._post_step({"1-delivery_type": "self"}, r)
         r = self._post_step(
             {
