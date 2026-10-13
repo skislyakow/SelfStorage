@@ -338,4 +338,3 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS("Демо-данные обновлены (idempotent, гибрид + фото).")
         )
-

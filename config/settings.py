@@ -112,5 +112,3 @@ SITE_URL = env("SITE_URL", default="https://selfstorage.kislyakov.pro")
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
-
-
