@@ -17,4 +17,6 @@ jobs:
           ssh_strict: false
           script_stop: true
           script: |
+            cd /opt/selftorage
+            git pull
             bash /opt/selftorage/deploy.sh
