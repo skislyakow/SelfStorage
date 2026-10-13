@@ -1,8 +1,8 @@
 from calendar import monthrange
 from datetime import date
+from decimal import Decimal
 from typing import cast
 
-from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -12,8 +12,8 @@ from formtools.wizard.views import SessionWizardView
 from apps.promotions.models import PromoCode
 from apps.rentals.forms import BoxForm, ContactsForm, DeliveryForm
 from apps.rentals.models import DeliveryRequest, RentalOrder
-from apps.warehouses.models import Box
 from apps.users.models import User
+from apps.warehouses.models import Box
 
 
 def add_months(start, months):
@@ -34,7 +34,9 @@ def calculate_amount(box, rental_months, start_date, promo):
             "full_month_price": full_price,
         }
     discount = promo.discount_percent / Decimal("100")
-    discounted_price = (full_price * (Decimal("1") - discount)).quantize(Decimal("0.01"))
+    discounted_price = (full_price * (Decimal("1") - discount)).quantize(
+        Decimal("0.01")
+    )
     discounted_months = 0
     full_months = 0
     total = Decimal("0")
@@ -77,7 +79,9 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
         if step == "0":
             box_id = self.request.GET.get("box")
             if box_id:
-                form.fields["box"].queryset = Box.objects.filter(pk=box_id, status="free")
+                form.fields["box"].queryset = Box.objects.filter(
+                    pk=box_id, status="free"
+                )
         return form
 
     def done(self, form_list, **kwargs):
@@ -154,6 +158,7 @@ class BoxAccessView(DetailView):
     Доступно по ссылке/QR любому, у кого есть QR (семья, охрана). Открытие
     возможно только при активной аренде (срок не вышел).
     """
+
     model = RentalOrder
     template_name = "rentals/qr_access.html"
     context_object_name = "order"
