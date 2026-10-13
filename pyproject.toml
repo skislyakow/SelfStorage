@@ -27,6 +27,7 @@ build-backend = "uv_build"
 dev = [
     "django-stubs>=6.1.2",
     "mypy>=2.4.0",
+    "pre-commit>=4.7.0",
     "ruff>=0.17.0",
 ]
 [tool.ruff]
