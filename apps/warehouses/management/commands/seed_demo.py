@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
         warehouses = {}
         for i, (city, address, temp, ceil, base, img) in enumerate(WAREHOUSES, start=1):
-            src = settings.BASE_DIR / "layot" / "img" / img
+            src = settings.BASE_DIR / "config" / "templates" / "img" / img
             dst_name = f"wh_{i}.png"
             photo = ""
             if src.exists():
@@ -338,3 +338,4 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS("Демо-данные обновлены (idempotent, гибрид + фото).")
         )
+
