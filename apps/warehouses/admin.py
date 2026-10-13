@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Warehouse, Box
+from .models import Box, Warehouse
 
 
 @admin.register(Box)

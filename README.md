@@ -1,134 +1,51 @@
 # SelfStorage
 
-Сервис аренды складских боксов (MVP). Стек: Python 3.12 + Django 5.2 + SQLite.
+Сервис аренды складских боксов. Клиент выбирает склад и бокс, оформляет аренду онлайн, оплачивает через ЮKassa и получает QR-доступ к боксу.
 
-## Запуск
+## Как запустить
 
 ```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+# 1. Клонируем репозиторий
+cd SelfStorage
+
+# 2. Устанавливаем зависимости через uv
+uv sync
+
+# 3. Создаём и заполняем .env (локальный запуск)
+Copy-Item .env.example .env
+
+# 4. Применяем миграции
+uv run python manage.py migrate
+
+# 5. Заполняем демо-данными
+uv run python manage.py seed_demo
+
+# 6. Запускаем сервер
+uv run python manage.py runserver
 ```
 
-Наполнение примерами — команда `python manage.py seed_demo` (идемпотентна: пересоздаёт склады, боксы, кабинет и промокод при каждом запуске).
+## Примеры работы
 
-## Демо-данные для входа
-
-После `seed_demo` в базе есть тестовые аккаунты:
+Демо-аккаунты (после `seed_demo`):
 
 | Роль | E-mail | Пароль |
-|------|--------|--------|
-| Администратор (панель `/admin/`) | `admin@selfstorage.ru` | `admin12345` |
+|---|---|---|
+| Администратор (`/admin/`) | `admin@selfstorage.ru` | `admin12345` |
 | Пользователь (кабинет Екатерины, `my-rent`) | `ekatyusha89@yandex.ru` | `111111111` |
 
-Прочие демо-данные: 5 складов (Москва, Одинцово, Пушкино, Люберцы, Домодедово) с фото, боксы, 2 активные аренды, промокоды `storage15` (скидка 15%, ноябрь–апрель) и `storage2022` (скидка 22%, март).
+Живой сайт: [https://selfstorage.kislyakov.pro](https://selfstorage.kislyakov.pro)
 
-## Структура
+## Документация
 
-- `config/` — настройки проекта (settings, urls, wsgi/asgi).
-- `apps/` — приложения по доменам:
-  - `users` — пользователи (email = логин, телефон, согласие на ПД).
-  - `warehouses` — склады и боксы.
-  - `rentals` — заказы аренды и заявки на доставку.
-  - `promotions` — промокоды.
-  - `payments` — платежи ЮKassa.
-  - `notifications` — письма и команда `send_notifications`.
-- `layot/` — исходная вёрстка (берётся как есть, не редактируется; адаптируется в шаблоны).
-- `static/` — статические файлы (css/img после адаптации вёрстки).
-- `media/` — загрузки (фото складов, qr.png); в `.gitignore`.
+- [CONVENTIONS.md](CONVENTIONS.md) — договорённости проекта (URL, сигналы, переменные шаблонов)
+- [docs/deployment.md](docs/deployment.md) — деплой, переменные окружения
+- [docs/utm.md](docs/utm.md) — UTM-метки и источники трафика
+- [docs/qr-access.md](docs/qr-access.md) — QR-доступ и статус бокса
+- [docs/notifications.md](docs/notifications.md) — напоминания и просрочки (systemd)
 
-## Договорённости
+## Лицензия
 
-Общие контракты (имена URL, переменные шаблонов, сигналы) зафиксированы в `CONVENTIONS.md`. Перед добавлением нового URL/сигнала/переменной — обнови этот файл.
+MIT
 
-## Переменные окружения / VPS
-
-Проект читает `.env` в корне через `django-environ` (`env.read_env`). Файл `.env` находится в `.gitignore` — **не коммитится**. Шаблон всех переменных — в `.env.example`.
-
-Локально (dev) `.env` необязателен: по умолчанию `DEBUG` берётся из окружения, а почта уходит в **консоль** (`console.EmailBackend`). На продакшене в `.env` на VPS нужно задать реальные значения, которых нет локально:
-
-- `SECRET_KEY` — уникальный секрет (обязательно отличный от дефолта).
-- `DEBUG=False`
-- `ALLOWED_HOSTS` — через запятую, напр. `selftorage.kislyakov.pro`.
-- `DB_PATH` — путь к sqlite, напр. `/opt/selftorage/db.sqlite3`.
-- `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`
-- `EMAIL_HOST=mail.hosting.reg.ru`, `EMAIL_PORT` (587 + `EMAIL_USE_TLS=True` либо 465 + `EMAIL_USE_SSL=True`), `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`. У домена `kislyakov.pro` должны быть опубликованы SPF/DKIM/DMARC, иначе письма уйдут в спам.
-
-Без SMTP-настроек письма не дойдут (упадут в консоль), но сайт продолжает работать.
-
-### Уведомления (`send_notifications`)
-
-Команда `python manage.py send_notifications` шлёт напоминания за 30/14/7/3 дня до окончания аренды (`status='active'`) и письма о просрочке (каждые 30 дней после перевода в `overdue`). Отправка устойчива к сбоям SMTP: ошибка для одного клиента логируется и не прерывает рассылку остальным.
-
-**Автозапуск на сервере (systemd timer).** В репозитории лежат юниты `selfstorage-notify.service` (oneshot — запуск команды) и `selfstorage-notify.timer` (ежедневно в 09:00). `deploy.sh` сам копирует их в `/etc/systemd/system/`, делает `systemctl daemon-reload` и `systemctl enable --now selfstorage-notify.timer`, поэтому при автодеплое таймер поднимается автоматически. VPS-пути: проект `/opt/selftorage`, venv `/opt/selftorage/.venv`, лог `/var/log/selftorage/send_notifications.log`.
-
-Проверка на сервере:
-
-```bash
-systemctl list-timers selfstorage-notify.timer
-journalctl -u selfstorage-notify.service -n 50
-cat /var/log/selftorage/send_notifications.log
-```
-
-**Быстрая проверка вручную** (без ожидания расписания): в админке `/admin/rentals/rentalorder/` выставьте тестовому заказу `end_date = сегодня + 3` (или `сегодня - 1` для просрочки) и `status='active'`, затем на сервере:
-
-```bash
-cd /opt/selftorage
-/opt/selftorage/.venv/bin/python manage.py send_notifications
-```
-
-Письмо придёт на email пользователя заказа (на проде — реально; локально без SMTP — в консоль).
-
-## Учёт источника рекламы
-
-Чтобы узнать, сколько заказов пришло с конкретной рекламы, помечайте рекламные
-ссылки UTM-параметром `utm_source` (или алиасом `src`). Middleware
-(`apps/rentals/middleware.py`) сохраняет метку в сессии посетителя, а при
-оформлении заказа визардом она записывается в `RentalOrder.traffic_source` и
-«переживает» весь путь до оплаты, даже если пользователь зашёл с рекламы, а
-заказ оформил позже.
-
-Где смотреть результаты:
-- фильтр `traffic_source` в `/admin/rentals/rentalorder/`;
-- карточка «Источники трафика» на дашборде владельца — таблица
-  `Источник | Заказов | Клиентов | Выручка` (пустые метки — `(без метки)`).
-
-### Примеры рекламных ссылок
-
-| Источник | Ссылка |
-|----------|--------|
-| ВКонтакте | `https://selftorage.kislyakov.pro/?utm_source=vk` |
-| Google Ads | `https://selftorage.kislyakov.pro/?utm_source=google` |
-| Яндекс.Директ (сразу на бокс) | `https://selftorage.kislyakov.pro/rentals/wizard/?box=1&utm_source=yandex` |
-| Facebook | `https://selftorage.kislyakov.pro/?utm_source=facebook&utm_campaign=vesna` |
-| Instagram (алиас `src`) | `https://selftorage.kislyakov.pro/?src=instagram` |
-
-После `seed_demo` в базе уже есть тестовые заказы с метками `vk`, `google`,
-`direct` и `demo` — карточка на дашборде сразу покажет пример статистики.
-
-## QR-доступ к боксу
-
-После оплаты заказа для аренды генерируется QR-код (`apps/rentals/services.py`,
-`RentalOrder.qr_code`), который пользователь видит в личном кабинете
-(`/orders/my-rent/`). QR кодирует ссылку на страницу доступа к боксу
-(`/orders/box-access/<id>/`).
-
-- Генерация вызывается при переходе заказа в статус `active` (в `_mark_paid`);
-  сбой генерации QR не блокирует оплату.
-- Файлы QR лежат в `media/qr/qr_<id>.png`.
-- В демо (`seed_demo`) QR генерируется для активных аренд.
-
-### Статус бокса «Открыт / Закрыт» (заглушка логики)
-
-Состояние `RentalOrder.access_status` (`open`/`closed`). Открытие происходит по
-QR: в личном кабинете для активной аренды сразу показывается QR-код с подсказкой
-«наведите камеру телефона». Переход по QR (GET `/orders/box-access/<id>/`)
-переводит бокс в `open` — страница показывает «Бокс открыт» и кнопку
-«Закрыть бокс» (POST `/orders/box-close/<id>/`), после закрытия в кабинете снова
-появляется QR. Открытие доступно любому, у кого есть ссылка (семья, охрана), но
-только пока аренда активна; если срок истёк — страница сообщает, что бокс
-недоступен, и QR в кабинете скрыт.
 
 

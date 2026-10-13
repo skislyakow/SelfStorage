@@ -6,15 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
-
-from yookassa import Configuration, Payment as YooPayment
+from yookassa import Configuration
+from yookassa import Payment as YooPayment
 
 from apps.notifications.email import greeting, send_notification
 from apps.payments.models import Payment
 from apps.rentals.models import RentalOrder
 from apps.rentals.services import generate_qr
-from apps.warehouses.models import Box
-
 
 logger = logging.getLogger(__name__)
 

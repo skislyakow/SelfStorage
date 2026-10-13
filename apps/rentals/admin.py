@@ -5,7 +5,7 @@ from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .models import RentalOrder, DeliveryRequest
+from .models import DeliveryRequest, RentalOrder
 
 
 @admin.register(DeliveryRequest)
@@ -20,7 +20,12 @@ class DeliveryRequestAdmin(admin.ModelAdmin):
         "rejection_reason_short",
     )
     list_filter = ("status",)
-    search_fields = ("client_address", "phone", "order__user__email", "order__user__phone")
+    search_fields = (
+        "client_address",
+        "phone",
+        "order__user__email",
+        "order__user__phone",
+    )
     readonly_fields = ("warehouse", "box")
     autocomplete_fields = ("order",)
     list_select_related = ("order__box__warehouse", "order__user")
@@ -43,7 +48,9 @@ class DeliveryRequestAdmin(admin.ModelAdmin):
         if not obj.client_address:
             return "—"
         link = f"https://yandex.ru/maps/?text={urlencode(obj.client_address)}"
-        return format_html('<a href="{}" target="_blank">{}</a>', link, obj.client_address)
+        return format_html(
+            '<a href="{}" target="_blank">{}</a>', link, obj.client_address
+        )
 
     @admin.display(description="Телефон")
     def phone_link(self, obj):
@@ -88,7 +95,16 @@ class OverdueCallFilter(admin.SimpleListFilter):
 
 @admin.register(RentalOrder)
 class RentalOrderAdmin(admin.ModelAdmin):
-    list_display = ("id", "client", "box_info", "status", "end_date", "days_overdue", "traffic_source", "last_overdue_notified")
+    list_display = (
+        "id",
+        "client",
+        "box_info",
+        "status",
+        "end_date",
+        "days_overdue",
+        "traffic_source",
+        "last_overdue_notified",
+    )
     list_filter = ("status", "traffic_source", OverdueCallFilter)
     search_fields = ("user__email", "user__phone", "box__number")
     list_select_related = ("user", "box__warehouse")
@@ -97,7 +113,7 @@ class RentalOrderAdmin(admin.ModelAdmin):
     def client(self, obj):
         phone = obj.user.phone
         return format_html(
-            "{}<br><a href=\"tel:{}\">{}</a>", obj.user.email, phone, phone
+            '{}<br><a href="tel:{}">{}</a>', obj.user.email, phone, phone
         )
 
     @admin.display(description="Бокс", ordering="box__number")

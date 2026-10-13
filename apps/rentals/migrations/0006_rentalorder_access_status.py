@@ -4,15 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('rentals', '0005_rentalorder_qr_code'),
+        ("rentals", "0005_rentalorder_qr_code"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='rentalorder',
-            name='access_status',
-            field=models.CharField(choices=[('closed', 'Закрыт'), ('open', 'Открыт')], default='closed', max_length=10, verbose_name='Статус бокса'),
+            model_name="rentalorder",
+            name="access_status",
+            field=models.CharField(
+                choices=[("closed", "Закрыт"), ("open", "Открыт")],
+                default="closed",
+                max_length=10,
+                verbose_name="Статус бокса",
+            ),
         ),
     ]

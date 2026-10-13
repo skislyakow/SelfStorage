@@ -5,8 +5,8 @@ from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from apps.rentals.models import RentalOrder
 from apps.notifications.email import greeting, plural_days
+from apps.rentals.models import RentalOrder
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,9 @@ class Command(BaseCommand):
                     )
 
         # Просроченные: переводим в overdue и напоминаем раз в месяц, начиная с 1-го дня
-        for order in RentalOrder.objects.filter(status__in=["active", "overdue"], end_date__lt=today):
+        for order in RentalOrder.objects.filter(
+            status__in=["active", "overdue"], end_date__lt=today
+        ):
             if order.status == "active":
                 order.status = "overdue"
             days_overdue = (today - order.end_date).days
@@ -61,6 +63,7 @@ class Command(BaseCommand):
                     order.last_overdue_notified = today
                 except Exception:
                     logger.exception(
-                        "Не удалось отправить письмо о просрочке для заказа %s", order.id
+                        "Не удалось отправить письмо о просрочке для заказа %s",
+                        order.id,
                     )
             order.save()

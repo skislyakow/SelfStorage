@@ -4,15 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('rentals', '0004_remove_rentalorder_overdue_notified_and_more'),
+        ("rentals", "0004_remove_rentalorder_overdue_notified_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='rentalorder',
-            name='qr_code',
-            field=models.FileField(blank=True, null=True, upload_to='qr/', verbose_name='QR-код доступа к боксу'),
+            model_name="rentalorder",
+            name="qr_code",
+            field=models.FileField(
+                blank=True,
+                null=True,
+                upload_to="qr/",
+                verbose_name="QR-код доступа к боксу",
+            ),
         ),
     ]

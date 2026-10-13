@@ -1,7 +1,7 @@
 from django import forms
 
-from apps.warehouses.models import Box
 from apps.promotions.models import PromoCode
+from apps.warehouses.models import Box
 
 INPUT_CLASS = "form-control border-8 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey"
 

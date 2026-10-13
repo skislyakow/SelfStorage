@@ -1,8 +1,7 @@
 import logging
 from datetime import date
 
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.management import call_command
 from django.db.models import Count, Sum
@@ -43,7 +42,11 @@ def owner_dashboard(request, *args, **kwargs):
 
     raw_sources = (
         RentalOrder.objects.values("traffic_source")
-        .annotate(orders=Count("id"), clients=Count("user", distinct=True), revenue=Sum("amount"))
+        .annotate(
+            orders=Count("id"),
+            clients=Count("user", distinct=True),
+            revenue=Sum("amount"),
+        )
         .order_by("-orders")
     )
     traffic_sources = []
@@ -52,7 +55,12 @@ def owner_dashboard(request, *args, **kwargs):
         label = row["traffic_source"] or "(без метки)"
         revenue = row["revenue"] or 0
         traffic_sources.append(
-            {"source": label, "orders": row["orders"], "clients": row["clients"], "revenue": revenue}
+            {
+                "source": label,
+                "orders": row["orders"],
+                "clients": row["clients"],
+                "revenue": revenue,
+            }
         )
         traffic_total["orders"] += row["orders"]
         traffic_total["clients"] += row["clients"]

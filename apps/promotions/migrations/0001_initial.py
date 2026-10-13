@@ -4,25 +4,39 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='PromoCode',
+            name="PromoCode",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.CharField(max_length=50, unique=True, verbose_name='Код')),
-                ('discount_percent', models.DecimalField(decimal_places=2, max_digits=5, verbose_name='Процент скидки')),
-                ('valid_from', models.DateField(verbose_name='Действует с')),
-                ('valid_to', models.DateField(verbose_name='Действует по')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "code",
+                    models.CharField(max_length=50, unique=True, verbose_name="Код"),
+                ),
+                (
+                    "discount_percent",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=5, verbose_name="Процент скидки"
+                    ),
+                ),
+                ("valid_from", models.DateField(verbose_name="Действует с")),
+                ("valid_to", models.DateField(verbose_name="Действует по")),
             ],
             options={
-                'verbose_name': 'Промокод',
-                'verbose_name_plural': 'Промокоды',
+                "verbose_name": "Промокод",
+                "verbose_name_plural": "Промокоды",
             },
         ),
     ]

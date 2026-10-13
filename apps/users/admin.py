@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
+from .forms import CustomUserChangeForm, CustomUserCreationForm
 from .models import User
-from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 
 @admin.register(User)
@@ -23,5 +23,8 @@ class UserAdmin(BaseUserAdmin):
         ("Согласие ПД", {"fields": ("pd_consent",)}),
     )
     add_fieldsets = (
-        ("Основное", {"fields": ("email", "first_name", "phone", "password1", "password2")}),
+        (
+            "Основное",
+            {"fields": ("email", "first_name", "phone", "password1", "password2")},
+        ),
     )

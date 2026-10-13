@@ -4,12 +4,8 @@ from django.db import models
 class Warehouse(models.Model):
     city = models.CharField("Город", max_length=100)
     address = models.CharField("Адрес", max_length=255)
-    photo = models.ImageField(
-        "Фото", upload_to="warehouses/", blank=True, null=True
-    )
-    temperature = models.CharField(
-        "Температура", max_length=50, blank=True, default=""
-    )
+    photo = models.ImageField("Фото", upload_to="warehouses/", blank=True, null=True)
+    temperature = models.CharField("Температура", max_length=50, blank=True, default="")
     ceiling_height = models.DecimalField(
         "Высота потолков, м",
         max_digits=5,
@@ -18,9 +14,7 @@ class Warehouse(models.Model):
         blank=True,
     )
     description = models.TextField("Описание", blank=True, default="")
-    contacts = models.CharField(
-        "Контакты", max_length=255, blank=True, default=""
-    )
+    contacts = models.CharField("Контакты", max_length=255, blank=True, default="")
 
     class Meta:
         verbose_name = "Склад"

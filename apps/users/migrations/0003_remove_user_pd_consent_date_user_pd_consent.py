@@ -4,19 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0002_alter_user_managers'),
+        ("users", "0002_alter_user_managers"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='user',
-            name='pd_consent_date',
+            model_name="user",
+            name="pd_consent_date",
         ),
         migrations.AddField(
-            model_name='user',
-            name='pd_consent',
-            field=models.BooleanField(default=False, verbose_name='Согласие на обработку ПД'),
+            model_name="user",
+            name="pd_consent",
+            field=models.BooleanField(
+                default=False, verbose_name="Согласие на обработку ПД"
+            ),
         ),
     ]

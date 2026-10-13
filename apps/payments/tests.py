@@ -144,7 +144,9 @@ class PaymentFlowTests(TestCase):
         self.assertTrue(self.order.qr_code)
         full = os.path.join(tmp, self.order.qr_code.name)
         self.assertTrue(os.path.exists(full))
-        self.assertEqual(self.order.qr_code.name, f"qr/qr_{self.order.pk}.png".replace("/", os.sep))
+        self.assertEqual(
+            self.order.qr_code.name, f"qr/qr_{self.order.pk}.png".replace("/", os.sep)
+        )
         self.assertIn(f"qr/qr_{self.order.pk}.png", self.order.qr_code.url)
         self.assertIn(
             reverse("qr_access", args=[self.order.pk]), qr_payload(self.order)

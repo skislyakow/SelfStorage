@@ -4,19 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('rentals', '0003_rentalorder_overdue_notified_and_more'),
+        ("rentals", "0003_rentalorder_overdue_notified_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='rentalorder',
-            name='overdue_notified',
+            model_name="rentalorder",
+            name="overdue_notified",
         ),
         migrations.AddField(
-            model_name='rentalorder',
-            name='last_overdue_notified',
-            field=models.DateField(blank=True, null=True, verbose_name='Дата последнего письма о просрочке'),
+            model_name="rentalorder",
+            name="last_overdue_notified",
+            field=models.DateField(
+                blank=True, null=True, verbose_name="Дата последнего письма о просрочке"
+            ),
         ),
     ]

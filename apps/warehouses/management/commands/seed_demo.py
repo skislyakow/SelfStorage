@@ -4,14 +4,14 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 
-from apps.warehouses.models import Warehouse, Box
-from apps.rentals.models import RentalOrder, DeliveryRequest
-from apps.rentals.services import generate_qr
-from apps.promotions.models import PromoCode
 from apps.payments.models import Payment
+from apps.promotions.models import PromoCode
+from apps.rentals.models import DeliveryRequest, RentalOrder
+from apps.rentals.services import generate_qr
+from apps.warehouses.models import Box, Warehouse
 
 User = get_user_model()
 
@@ -62,7 +62,7 @@ class Command(BaseCommand):
             # Гибрид: ~12 боксов со случайно-детерминированными параметрами
             for j in range(1, 13):
                 area = BOX_AREAS[(i + j) % len(BOX_AREAS)]
-                width = round(area ** 0.5, 1)
+                width = round(area**0.5, 1)
                 length = round(area / width, 1)
                 height = 2.5
                 price = base + (area - 1) * 150
@@ -88,12 +88,30 @@ class Command(BaseCommand):
         odintsovo = warehouses["Одинцово"]
         lyubertsi = warehouses["Люберцы"]
         box_ekat1, _ = Box.objects.get_or_create(
-            warehouse=odintsovo, number="2389-12",
-            defaults=dict(floor=2, area=3, length=2, width=2, height=2.5, price_per_month=2561, status="occupied"),
+            warehouse=odintsovo,
+            number="2389-12",
+            defaults=dict(
+                floor=2,
+                area=3,
+                length=2,
+                width=2,
+                height=2.5,
+                price_per_month=2561,
+                status="occupied",
+            ),
         )
         box_ekat2, _ = Box.objects.get_or_create(
-            warehouse=lyubertsi, number="2335-10",
-            defaults=dict(floor=1, area=2, length=2, width=1, height=2.5, price_per_month=1408, status="occupied"),
+            warehouse=lyubertsi,
+            number="2335-10",
+            defaults=dict(
+                floor=1,
+                area=2,
+                length=2,
+                width=1,
+                height=2.5,
+                price_per_month=1408,
+                status="occupied",
+            ),
         )
 
         # Пользователи: Екатерина (как в макете) + суперюзер для админки
@@ -125,23 +143,39 @@ class Command(BaseCommand):
 
         # Две активные аренды Екатерины
         order1 = RentalOrder.objects.create(
-            user=user, box=box_ekat1,
-            start_date=date(2022, 3, 15), end_date=date(2022, 6, 28),
+            user=user,
+            box=box_ekat1,
+            start_date=date(2022, 3, 15),
+            end_date=date(2022, 6, 28),
             items_text="Сезонные вещи: лыжи, сноуборд, коробки с книгами.",
-            status="active", promo=promo_storage15,
+            status="active",
+            promo=promo_storage15,
             amount=box_ekat1.price_per_month * Decimal("0.85"),
             traffic_source="vk",
         )
         order2 = RentalOrder.objects.create(
-            user=user, box=box_ekat2,
-            start_date=date(2022, 3, 18), end_date=date(2022, 9, 21),
+            user=user,
+            box=box_ekat2,
+            start_date=date(2022, 3, 18),
+            end_date=date(2022, 9, 21),
             items_text="Мебель и документы на хранение.",
-            status="active", amount=box_ekat2.price_per_month,
+            status="active",
+            amount=box_ekat2.price_per_month,
             traffic_source="google",
         )
 
-        Payment.objects.create(order=order1, yookassa_id=f"test_{order1.pk}", status="succeeded", amount=order1.amount)
-        Payment.objects.create(order=order2, yookassa_id=f"test_{order2.pk}", status="succeeded", amount=order2.amount)
+        Payment.objects.create(
+            order=order1,
+            yookassa_id=f"test_{order1.pk}",
+            status="succeeded",
+            amount=order1.amount,
+        )
+        Payment.objects.create(
+            order=order2,
+            yookassa_id=f"test_{order2.pk}",
+            status="succeeded",
+            amount=order2.amount,
+        )
 
         generate_qr(order1)
         generate_qr(order2)
@@ -181,9 +215,7 @@ class Command(BaseCommand):
 
         # Новая заявка на доставку — очередь к выполнению
         new_box = (
-            Box.objects.filter(warehouse=odintsovo)
-            .exclude(pk=box_ekat1.pk)
-            .first()
+            Box.objects.filter(warehouse=odintsovo).exclude(pk=box_ekat1.pk).first()
         )
         new_order = RentalOrder.objects.create(
             user=user,
@@ -238,34 +270,53 @@ class Command(BaseCommand):
             ("new", "Москва, ул. Тверская, д. 20", ""),
             ("in_progress", "Москва, ул. Ленина, д. 5, кв. 12", ""),
             ("done", "Пушкино, ул. Лесная, д. 3", ""),
-            ("rejected", "Люберцы, ул. Мира, д. 8",
-             "Отказ принять на доставку: вещи не влезают в лифт, вынос на 5 этаж невозможен."),
-            ("rejected", "Домодедово, ул. Центральная, д. 14",
-             "Отказ принять на доставку: клиент не предоставил согласие на обработку персональных данных."),
+            (
+                "rejected",
+                "Люберцы, ул. Мира, д. 8",
+                "Отказ принять на доставку: вещи не влезают в лифт, вынос на 5 этаж невозможен.",
+            ),
+            (
+                "rejected",
+                "Домодедово, ул. Центральная, д. 14",
+                "Отказ принять на доставку: клиент не предоставил согласие на обработку персональных данных.",
+            ),
             ("new", "Одинцово, ул. Садовая, д. 2, кв. 30", ""),
             ("in_progress", "Москва, ул. Арбат, д. 11, кв. 4", ""),
             ("done", "Одинцово, ул. Школьная, д. 7", ""),
             ("new", "Пушкино, ул. Заводская, д. 22", ""),
             ("in_progress", "Люберцы, ул. Октября, д. 9, кв. 51", ""),
             ("done", "Домодедово, ул. Парковая, д. 3", ""),
-            ("rejected", "Москва, ул. Профсоюзная, д. 44",
-             "Отказ принять на доставку: вещи в повреждённой упаковке, не допускаются к хранению."),
-            ("rejected", "Москва, ул. Лесная, д. 17, кв. 33",
-             "Отказ принять на доставку: адрес вне зоны бесплатной доставки."),
-            ("rejected", "Одинцово, ул. Центральная, д. 4",
-             "Отказ принять на доставку: обнаружены запрещённые вещи по правилам хранения."),
-            ("rejected", "Пушкино, ул. Советская, д. 9",
-             "Отказ принять на доставку: превышен допустимый вес и объём партии."),
-            ("rejected", "Люберцы, ул. Победы, д. 2, кв. 14",
-             "Отказ принять на доставку: клиент не оплатил заказ, бронь истекла."),
+            (
+                "rejected",
+                "Москва, ул. Профсоюзная, д. 44",
+                "Отказ принять на доставку: вещи в повреждённой упаковке, не допускаются к хранению.",
+            ),
+            (
+                "rejected",
+                "Москва, ул. Лесная, д. 17, кв. 33",
+                "Отказ принять на доставку: адрес вне зоны бесплатной доставки.",
+            ),
+            (
+                "rejected",
+                "Одинцово, ул. Центральная, д. 4",
+                "Отказ принять на доставку: обнаружены запрещённые вещи по правилам хранения.",
+            ),
+            (
+                "rejected",
+                "Пушкино, ул. Советская, д. 9",
+                "Отказ принять на доставку: превышен допустимый вес и объём партии.",
+            ),
+            (
+                "rejected",
+                "Люберцы, ул. Победы, д. 2, кв. 14",
+                "Отказ принять на доставку: клиент не оплатил заказ, бронь истекла.",
+            ),
         ]
         wh_list = list(warehouses.values())
         emails = list(clients.keys())
         for i, (status, address, reason) in enumerate(DELIVERY_DEMO):
             wh = wh_list[i % len(wh_list)]
-            demo_box = (
-                Box.objects.filter(warehouse=wh).exclude(pk=box_ekat1.pk).first()
-            )
+            demo_box = Box.objects.filter(warehouse=wh).exclude(pk=box_ekat1.pk).first()
             demo_order = RentalOrder.objects.create(
                 user=clients[emails[i]],
                 box=demo_box,
@@ -284,4 +335,6 @@ class Command(BaseCommand):
                 rejection_reason=reason,
             )
 
-        self.stdout.write(self.style.SUCCESS("Демо-данные обновлены (idempotent, гибрид + фото)."))
+        self.stdout.write(
+            self.style.SUCCESS("Демо-данные обновлены (idempotent, гибрид + фото).")
+        )
