@@ -52,6 +52,65 @@ class RegistrationTests(TestCase):
         self.assertEqual(User.objects.get(email="welcome@test.ru").first_name, "Привет")
 
 
+class NextRedirectTests(TestCase):
+    """Возврат в оформление заказа после входа и регистрации.
+
+    Анонимный переход на закрытую страницу уходит на форму входа: со строкой
+    LOGIN_URL = "/login/" он попадал на 404, потому что вход живёт на
+    /accounts/login/.
+    """
+
+    def setUp(self):
+        self.client = Client(SERVER_NAME="localhost")
+
+    @staticmethod
+    def register_data(**overrides):
+        data = {
+            "email": "next@test.ru",
+            "first_name": "Гость",
+            "phone": "+79990000000",
+            "password1": "Str0ngPass!123",
+            "password2": "Str0ngPass!123",
+            "personal_data_consent": "on",
+        }
+        data.update(overrides)
+        return data
+
+    def test_login_required_redirect_lands_on_real_page(self):
+        response = self.client.get(reverse("my_rent"))
+        login_url = f"{reverse('users:login')}?next={reverse('my_rent')}"
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], login_url)
+        self.assertEqual(self.client.get(login_url).status_code, 200)
+
+    def test_register_returns_to_next(self):
+        response = self.client.post(
+            reverse("users:register"),
+            self.register_data(next=reverse("my_rent")),
+        )
+        self.assertRedirects(
+            response, reverse("my_rent"), fetch_redirect_response=False
+        )
+
+    def test_register_without_next_goes_home(self):
+        response = self.client.post(reverse("users:register"), self.register_data())
+        self.assertEqual(response["Location"], reverse("home"))
+
+    def test_register_ignores_next_on_another_host(self):
+        response = self.client.post(
+            reverse("users:register"),
+            self.register_data(next="https://evil.example.com/phish"),
+        )
+        self.assertEqual(response["Location"], reverse("home"))
+
+    def test_auth_forms_post_to_real_views(self):
+        page = self.client.get(reverse("home")).content.decode()
+
+        for url_name in ("users:login", "users:register", "users:password_reset"):
+            self.assertIn(f'action="{reverse(url_name)}"', page)
+
+
 class UserAdminTests(TestCase):
     def test_user_admin_list_and_change_minimal(self):
         User.objects.create_superuser(email="admin@test.ru", password="x1!aaaaA2")

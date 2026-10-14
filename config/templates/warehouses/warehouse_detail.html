@@ -114,8 +114,11 @@
 <script>
   document.querySelectorAll('[data-wizard-next]').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var inp = document.querySelector('#SignModal input[name="next"]');
-      if (inp) inp.value = btn.getAttribute('data-wizard-next');
+      var target = btn.getAttribute('data-wizard-next');
+      ['#SignModal', '#RegModal'].forEach(function (sel) {
+        var inp = document.querySelector(sel + ' input[name="next"]');
+        if (inp) inp.value = target;
+      });
     });
   });
 </script>

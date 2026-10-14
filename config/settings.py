@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import environ
+from django.urls import reverse_lazy
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -110,6 +111,9 @@ YOOKASSA_SHOP_ID = env("YOOKASSA_SHOP_ID", default="")
 YOOKASSA_SECRET_KEY = env("YOOKASSA_SECRET_KEY", default="")
 SITE_URL = env("SITE_URL", default="https://selfstorage.kislyakov.pro")
 
-LOGIN_URL = "/login/"
+# Куда уходит аноним из login_required/LoginRequiredMixin. Адрес берём из
+# URLconf, а не строкой: со строкой "/login/" редирект вёл на 404, потому что
+# настоящая страница входа живёт на /accounts/login/.
+LOGIN_URL = reverse_lazy("users:login")
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
