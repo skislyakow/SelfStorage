@@ -13,6 +13,7 @@
 - Обновить скиллы: pwsh scripts/bootstrap.ps1 -Update
 - Run tests: SECRET_KEY=test-key uv run python manage.py test (51 tests)
 - Lint: uv run ruff check . && uv run ruff format --check .
+- Типы: uv run mypy .
 - Format: uv run ruff format .
 
 ## Infra

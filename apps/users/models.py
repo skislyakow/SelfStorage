@@ -29,12 +29,14 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    username = None
+    # Вход по email: поле username убрано, поэтому тип из AbstractUser не подходит.
+    username = None  # type: ignore[assignment]
     email = models.EmailField("Email", unique=True)
     phone = models.CharField("Телефон", max_length=20, blank=True, default="")
     pd_consent = models.BooleanField("Согласие на обработку ПД", default=False)
 
-    objects = UserManager()
+    # Свой менеджер вместо django.contrib.auth.models.UserManager.
+    objects = UserManager()  # type: ignore[assignment,misc]
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: ClassVar[list[str]] = []
 
