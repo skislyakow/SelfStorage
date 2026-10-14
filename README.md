@@ -8,8 +8,8 @@
 # 1. Клонируем репозиторий
 cd SelfStorage
 
-# 2. Устанавливаем зависимости через uv
-uv sync
+# 2. Создаём окружение: зависимости uv + локальные скиллы агентов
+./scripts/bootstrap.ps1
 
 # 3. Создаём и заполняем .env (локальный запуск)
 Copy-Item .env.example .env
@@ -42,6 +42,24 @@ uv run python manage.py runserver
 - [docs/utm.md](docs/utm.md) — UTM-метки и источники трафика
 - [docs/qr-access.md](docs/qr-access.md) — QR-доступ и статус бокса
 - [docs/notifications.md](docs/notifications.md) — напоминания и просрочки (systemd)
+
+## Скиллы агентов
+
+Каталог `.agents/skills/` (скиллы [mattpocock/skills](https://github.com/mattpocock/skills) для OpenCode) **не хранится в git** — на каждой машине он свой. В репозитории лежит только `skills-lock.json`: манифест с источником и хешами, по которому скиллы восстанавливаются одной командой.
+
+```powershell
+# окружение: зависимости uv + локальные скиллы из skills-lock.json
+./scripts/bootstrap.ps1
+
+# обновить скиллы до последних версий (заодно перепишет skills-lock.json)
+./scripts/bootstrap.ps1 -Update
+
+# точечно, без скрипта
+npx -y skills@latest update -p -y
+npx -y skills@latest add mattpocock/skills -a opencode
+```
+
+Требуется Node.js (`npx`). Если его нет — окружение всё равно поднимается, скиллы просто не ставятся.
 
 ## Лицензия
 

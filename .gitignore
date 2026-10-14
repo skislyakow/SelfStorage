@@ -11,3 +11,7 @@ _.srv.*
 .DS_Store
 .venv/
 cache*.db
+
+# Скиллы агентов — только локально, ставятся из skills-lock.json
+# через scripts/bootstrap.ps1 / scripts/bootstrap.sh
+.agents/
