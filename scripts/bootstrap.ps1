@@ -11,6 +11,13 @@ $ErrorActionPreference = "Stop"
 Write-Host "==> uv sync"
 uv sync
 
+if (Test-Path ".git") {
+    Write-Host "==> pre-commit install"
+    uv run pre-commit install
+} else {
+    Write-Warning "no .git directory: skipping pre-commit install"
+}
+
 if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
     Write-Warning "npx not found: skipping agent skills (Node.js is required)."
     exit 0

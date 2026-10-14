@@ -15,6 +15,13 @@ esac
 echo "==> uv sync"
 uv sync
 
+if [ -d .git ]; then
+    echo "==> pre-commit install"
+    uv run pre-commit install
+else
+    echo "warning: no .git directory - skipping pre-commit install" >&2
+fi
+
 if ! command -v npx >/dev/null 2>&1; then
     echo "warning: npx not found - skipping agent skills (Node.js is required)" >&2
     exit 0

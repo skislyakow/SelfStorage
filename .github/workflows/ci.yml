@@ -53,5 +53,7 @@ jobs:
           enable-cache: true
       - name: Sync deps
         run: uv sync --frozen
+      - name: Check migrations
+        run: uv run python manage.py makemigrations --check --dry-run
       - name: Run Django tests
         run: uv run python manage.py test
