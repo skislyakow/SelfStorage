@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from django.db import models
 
 
@@ -38,7 +40,7 @@ class Warehouse(models.Model):
 
 
 class Box(models.Model):
-    STATUS_CHOICES = [
+    STATUS_CHOICES: ClassVar[list[tuple[str, str]]] = [
         ("free", "Свободен"),
         ("reserved", "Зарезервирован"),
         ("occupied", "Занят"),

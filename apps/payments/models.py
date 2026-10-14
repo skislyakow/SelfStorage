@@ -1,8 +1,10 @@
+from typing import ClassVar
+
 from django.db import models
 
 
 class Payment(models.Model):
-    STATUS_CHOICES = [
+    STATUS_CHOICES: ClassVar[list[tuple[str, str]]] = [
         ("pending", "Ожидает"),
         ("succeeded", "Успешно"),
         ("canceled", "Отменён"),

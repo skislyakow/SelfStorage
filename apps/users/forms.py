@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from django import forms
 from django.contrib.auth.forms import (
     AuthenticationForm,
@@ -22,7 +24,9 @@ class CustomUserCreationForm(UserCreationForm):
         label="Согласие на обработку персональных данных",
         required=True,
         error_messages={
-            "required": "Для регистрации необходимо согласие на обработку персональных данных"
+            "required": (
+                "Для регистрации необходимо согласие на обработку персональных данных"
+            )
         },
         widget=forms.CheckboxInput(
             attrs={"class": "form-check-input", "id": "personalDataConsent"}
@@ -32,7 +36,7 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("first_name", "email", "phone", "password1", "password2")
-        widgets = {
+        widgets: ClassVar[dict] = {
             "email": forms.EmailInput(attrs={"class": "form-control"}),
             "phone": forms.TextInput(attrs={"class": "form-control"}),
             "password1": forms.PasswordInput(attrs={"class": "form-control"}),

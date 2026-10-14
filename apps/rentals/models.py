@@ -1,9 +1,11 @@
+from typing import ClassVar
+
 from django.conf import settings
 from django.db import models
 
 
 class RentalOrder(models.Model):
-    STATUS_CHOICES = [
+    STATUS_CHOICES: ClassVar[list[tuple[str, str]]] = [
         ("awaiting_payment", "Ожидает оплаты"),
         ("active", "Активна"),
         ("overdue", "Просрочена"),
@@ -51,7 +53,7 @@ class RentalOrder(models.Model):
     qr_code = models.FileField(
         "QR-код доступа к боксу", upload_to="qr/", blank=True, null=True
     )
-    ACCESS_CHOICES = [
+    ACCESS_CHOICES: ClassVar[list[tuple[str, str]]] = [
         ("closed", "Закрыт"),
         ("open", "Открыт"),
     ]
@@ -68,7 +70,7 @@ class RentalOrder(models.Model):
 
 
 class DeliveryRequest(models.Model):
-    STATUS_CHOICES = [
+    STATUS_CHOICES: ClassVar[list[tuple[str, str]]] = [
         ("new", "Новая"),
         ("in_progress", "В пути"),
         ("done", "Выполнена"),

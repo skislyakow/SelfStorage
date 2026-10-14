@@ -1,7 +1,7 @@
 from calendar import monthrange
 from datetime import date
 from decimal import Decimal
-from typing import cast
+from typing import ClassVar, cast
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
@@ -59,7 +59,7 @@ def calculate_amount(box, rental_months, start_date, promo):
 
 
 class OrderWizard(LoginRequiredMixin, SessionWizardView):
-    form_list = [BoxForm, DeliveryForm, ContactsForm]
+    form_list: ClassVar[list] = [BoxForm, DeliveryForm, ContactsForm]
     template_name = "rentals/wizard.html"
 
     def get_form_initial(self, step):

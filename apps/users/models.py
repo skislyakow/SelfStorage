@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -34,7 +36,7 @@ class User(AbstractUser):
 
     objects = UserManager()
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS: ClassVar[list[str]] = []
 
     class Meta:
         verbose_name = "Пользователь"

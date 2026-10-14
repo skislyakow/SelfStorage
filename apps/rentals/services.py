@@ -15,7 +15,7 @@ def qr_payload(order):
 
 
 def generate_qr(order):
-    """Сгенерировать QR-код доступа к боксу заказа, сохранить в media/qr/ и вернуть FieldFile."""
+    """Сгенерировать QR-код доступа, сохранить файл в media/qr/ и вернуть FieldFile."""
     data = qr_payload(order)
     qr = qrcode.QRCode(
         version=1,

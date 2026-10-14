@@ -57,7 +57,9 @@ def create_payment(request, order_id):
                 "capture": True,
                 "confirmation": {
                     "type": "redirect",
-                    "return_url": f"{settings.SITE_URL}/orders/payment-success/{order.id}/",
+                    "return_url": (
+                        f"{settings.SITE_URL}/orders/payment-success/{order.id}/"
+                    ),
                 },
                 "description": f"Аренда бокса №{order.box.number} — заказ #{order.id}",
                 "metadata": {
@@ -125,7 +127,8 @@ def _mark_paid(payment, order):
                 f"{greeting(order.user)} Спасибо! Оплата заказа #{order.id} "
                 f"(бокс №{order.box.number}, {order.box.area} м²) получена.\n"
                 f"Сумма: {order.amount} ₽.\n"
-                f"Забронированный срок: с {order.start_date:%d.%m.%Y} по {order.end_date:%d.%m.%Y}."
+                f"Забронированный срок: с {order.start_date:%d.%m.%Y} "
+                f"по {order.end_date:%d.%m.%Y}."
             ),
         )
 
