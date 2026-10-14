@@ -1,9 +1,9 @@
-# Set up the local environment: Python dependencies + local agent skills.
+# Set up the local environment: Python dependencies, git hooks + local agent skills.
 # .agents/ is not tracked in git (see .gitignore): skills are installed from
 # skills-lock.json so every machine gets the same versions.
 #
-#   ./scripts/bootstrap.ps1         # uv sync + restore skills if missing
-#   ./scripts/bootstrap.ps1 -Update # uv sync + update skills to latest
+#   ./scripts/bootstrap.ps1         # uv sync + pre-commit install + restore skills if missing
+#   ./scripts/bootstrap.ps1 -Update # uv sync + pre-commit install + update skills to latest
 param([switch]$Update)
 
 $ErrorActionPreference = "Stop"

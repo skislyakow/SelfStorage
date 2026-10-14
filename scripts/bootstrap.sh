@@ -1,10 +1,10 @@
 #!/usr/bin/env sh
-# Set up the local environment: Python dependencies + local agent skills.
+# Set up the local environment: Python dependencies, git hooks + local agent skills.
 # .agents/ is not tracked in git (see .gitignore): skills are installed from
 # skills-lock.json so every machine gets the same versions.
 #
-#   ./scripts/bootstrap.sh          # uv sync + restore skills if missing
-#   ./scripts/bootstrap.sh --update # uv sync + update skills to latest
+#   ./scripts/bootstrap.sh          # uv sync + pre-commit install + restore skills if missing
+#   ./scripts/bootstrap.sh --update # uv sync + pre-commit install + update skills to latest
 set -eu
 
 update=0
