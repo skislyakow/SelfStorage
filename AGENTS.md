@@ -3,10 +3,12 @@
 ## Navigation
 - apps/ - Django apps (users, warehouses, rentals, promotions, payments, notifications)
 - config/ - settings, urls, wsgi/asgi, templates
-- docs/ - project docs (deploy, utm, qr, notifications, arch review)
+- docs/ - project docs (deploy, utm, qr, notifications, arch review, TODO)
+- docs/TODO.md - открытые задачи проекта: продолжать работу отсюда, дописывать туда же
 - .agents/skills/ - скиллы mattpocock для opencode; каталог локальный, НЕ в git (см. .gitignore), восстанавливается из skills-lock.json
 - skills-lock.json - манифест скиллов (источник + хеши), лежит в git
 - CONVENTIONS.md - repo conventions (URLs, signals, context vars)
+- GitHub owner - skislyakow (в URL репозитория и бейджей); домен проекта kislyakov.pro - не путать, в аккаунте есть «w»
 
 ## Dev
 - Создать окружение: .\scripts\bootstrap.ps1 (uv sync + хук pre-commit + скиллы из skills-lock.json)

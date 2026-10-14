@@ -2,7 +2,18 @@
 
 Сервис аренды складских боксов: клиент выбирает склад и бокс, оформляет аренду онлайн, оплачивает через ЮKassa и получает QR-код для доступа к боксу.
 
-[![CI](https://github.com/skislyakov/SelfStorage/actions/workflows/ci.yml/badge.svg)](https://github.com/skislyakov/SelfStorage/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.0.2-7952B3?logo=bootstrap&logoColor=white)
+![uv](https://img.shields.io/badge/deps-uv-DE5FE9?logo=uv&logoColor=white)
+![nginx](https://img.shields.io/badge/nginx-1.24-009639?logo=nginx&logoColor=white)
+
+[![CI](https://github.com/skislyakow/SelfStorage/actions/workflows/ci.yml/badge.svg)](https://github.com/skislyakow/SelfStorage/actions/workflows/ci.yml)
+![ruff](https://img.shields.io/badge/lint-ruff-D7FF64?logo=ruff&logoColor=black)
+![mypy](https://img.shields.io/badge/types-mypy-2A6DB5)
+![pre--commit](https://img.shields.io/badge/hooks-pre--commit-FAB040?logo=precommit&logoColor=black)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 **Демо-стенд:** [selfstorage.kislyakov.pro](https://selfstorage.kislyakov.pro)
 
@@ -111,6 +122,7 @@ deploy.sh    шаги деплоя на сервере
 
 ## Документация
 
+- [docs/TODO.md](docs/TODO.md) — открытые задачи проекта (что осталось сделать)
 - [CONVENTIONS.md](CONVENTIONS.md) — договорённости проекта (URL, сигналы, переменные шаблонов)
 - [AGENTS.md](AGENTS.md) — окружение, команды и правила работы агентов в этом репозитории
 - [docs/deployment.md](docs/deployment.md) — деплой, переменные окружения
