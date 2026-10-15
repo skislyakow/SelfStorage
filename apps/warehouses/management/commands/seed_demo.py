@@ -11,7 +11,7 @@ from apps.payments.models import Payment
 from apps.promotions.models import PromoCode
 from apps.rentals.models import DeliveryRequest, RentalOrder
 from apps.rentals.services import generate_qr
-from apps.warehouses.models import Box, Warehouse
+from apps.warehouses.models import Box, Review, Warehouse
 
 User = get_user_model()
 
@@ -34,8 +34,9 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        # Идемпотентная очистка (каскад удаляет Box/Order/Payment/Delivery)
+        # Идемпотентная очистка (каскад удаляет Box/Order/Payment/Delivery/Review)
         Warehouse.objects.all().delete()
+        Review.objects.all().delete()
         PromoCode.objects.all().delete()
         User.objects.all().delete()
 
@@ -44,7 +45,7 @@ class Command(BaseCommand):
 
         warehouses = {}
         for i, (city, address, temp, ceil, base, img) in enumerate(WAREHOUSES, start=1):
-            src = settings.BASE_DIR / "config" / "templates" / "img" / img
+            src = settings.BASE_DIR / "static" / "img" / img
             dst_name = f"wh_{i}.png"
             photo = ""
             if src.exists():
@@ -344,6 +345,55 @@ class Command(BaseCommand):
                 status=status,
                 rejection_reason=reason,
             )
+
+        # Отзывы для карусели на главной (как в макете): два опубликованных
+        # и один на модерации — чтобы в админке было видно сценарий публикации.
+        media_rev = settings.MEDIA_ROOT / "reviews"
+        os.makedirs(media_rev, exist_ok=True)
+
+        def review_photo(template_img: str, name: str) -> str:
+            src = settings.BASE_DIR / "static" / "img" / template_img
+            if src.exists():
+                shutil.copy(src, media_rev / name)
+                return f"reviews/{name}"
+            return ""
+
+        Review.objects.create(
+            title="Теперь могу хранить вещи по-умному!",
+            author_name="Катерина Петрова",
+            city="Одинцово",
+            warehouse=odintsovo,
+            text=(
+                "Быстро собрали вещи и бесплатно доставили до ближайшего склада.\n"
+                "Удобная система напоминания о том, что срок хранения "
+                "подходит к концу.\n"
+                "Вещи были в целостности, ничего не повредилось."
+            ),
+            photo=review_photo("img1.png", "review_1.png"),
+            is_published=True,
+        )
+        Review.objects.create(
+            title="Больше не мучаюсь: выкидывать вещи или нет",
+            author_name="Николай Овсянников",
+            city="Люберцы",
+            warehouse=lyubertsi,
+            text=(
+                "Очень тяжело было прощаться с вещами, которые были у меня с самого "
+                "детства. На новую квартиру все никак не могло уместиться, начал "
+                "ломать голову, что же делать. Решил попробовать арендовать бокс "
+                "на полгода, такой опыт был впервые."
+            ),
+            photo=review_photo("img2.png", "review_2.png"),
+            is_published=True,
+        )
+        Review.objects.create(
+            title="Отзыв на модерации",
+            author_name="Тестовый Автор",
+            city="Москва",
+            warehouse=warehouses["Москва"],
+            text="Этот отзыв не опубликован — виден только в админке.",
+            is_published=False,
+        )
 
         self.stdout.write(
             self.style.SUCCESS("Демо-данные обновлены (idempotent, гибрид + фото).")

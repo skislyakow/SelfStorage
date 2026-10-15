@@ -3,6 +3,32 @@ from typing import ClassVar
 from django.db import models
 
 
+class Review(models.Model):
+    title = models.CharField("Заголовок", max_length=200)
+    author_name = models.CharField("Имя автора", max_length=100)
+    city = models.CharField("Город", max_length=100, blank=True, default="")
+    photo = models.ImageField("Фото", upload_to="reviews/", blank=True, null=True)
+    text = models.TextField("Текст отзыва")
+    warehouse = models.ForeignKey(
+        "warehouses.Warehouse",
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        verbose_name="Склад",
+        null=True,
+        blank=True,
+    )
+    is_published = models.BooleanField("Опубликован", default=True)
+    created_at = models.DateTimeField("Дата отзыва", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"Отзыв {self.author_name} ({self.city or 'без города'})"
+
+
 class Warehouse(models.Model):
     city = models.CharField("Город", max_length=100)
     address = models.CharField("Адрес", max_length=255)

@@ -143,46 +143,33 @@
 	</div>
 </article>
 
+{% if reviews %}
 <article class="row pt-header">
 	<h1 class="text-center fw-bold SelfStorage_green mb-4">Забота о ваших ценностях – наша главная задача</h1>
 	<div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
 		<div class="carousel-inner border">
-			<div class="carousel-item active">
+			{% for review in reviews %}
+			<div class="carousel-item {% if forloop.first %}active{% endif %}">
 				<div class="row p-5">
 					<div class="col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center">
 						<div>
-							<h4 class="fw-bold">«Теперь могу хранить вещи по-умному!»</h4>
-							<p class="fs_24">Быстро собрали вещи и бесплатно доставили до ближайшего склада.</p>
-							<p class="fs_24">Удобная система напоминания о том, что срок хранения подходит к концу.</p>
-							<p class="fs_24">Вещи были в целостности, ничего не повредилось.</p>
-							<a href="#" class="SelfStorage_green">Читать отзыв полностью</a>
+							<h4 class="fw-bold">«{{ review.title }}»</h4>
+							<p class="fs_24">{{ review.text|truncatechars:220 }}</p>
+							<a href="#" class="SelfStorage_green" data-bs-toggle="modal" data-bs-target="#reviewModal{{ review.pk }}">Читать отзыв полностью</a>
 						</div>
 					</div>
 					<div class="col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center">
-						<img src="{% static 'img/img1.png' %}" width="290" height="290" class="rounded-pill mb-3" alt="">
-						<span class="fw-bold">Катерина Петрова</span>
-						<span>Одинцово</span>
+						{% if review.photo %}
+						<img src="{{ review.photo.url }}" width="290" height="290" class="rounded-pill mb-3" alt="{{ review.author_name }}">
+						{% else %}
+						<img src="{% static 'img/img1.png' %}" width="290" height="290" class="rounded-pill mb-3" alt="{{ review.author_name }}">
+						{% endif %}
+						<span class="fw-bold">{{ review.author_name }}</span>
+						<span>{{ review.city }}</span>
 					</div>
 				</div>
 			</div>
-			<div class="carousel-item">
-				<div class="row p-5">
-					<div class="col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center">
-						<div>
-							<h4 class="fw-bold">«Больше не мучаюсь: выкидывать вещи или нет»</h4>
-							<p class="fs_24">Очень тяжело было прощаться с вещами, которые были у меня с самого детства.
-								На новую квартиру все никак не могло уместиться, начал ломать голову, что же делать.
-								Решил попробовать арендовать бокс на полгода, такой опыт был впервые.</p>
-							<a href="#" class="SelfStorage_green">Читать отзыв полностью</a>
-						</div>
-					</div>
-					<div class="col-12 col-lg-6 d-flex flex-column align-items-center justify-content-center">
-						<img src="{% static 'img/img2.png' %}" width="290" height="290"  class="rounded-pill mb-3" alt="">
-						<span class="fw-bold">Николай Овсянников</span>
-						<span>Люберцы</span>
-					</div>
-				</div>
-			</div>
+			{% endfor %}
 		</div>
 		<div class="w-100 d-flex justify-content-center mt-5">
 			<button data-bs-target="#carouselExampleControls" data-bs-slide="prev" class="btn rounded-pill d-flex justify-content-center align-items-center SelfStorage__bg_green" style="width: 66px; height: 66px;">
@@ -198,7 +185,27 @@
 			</button>
 		</div>
 	</div>
+	{% for review in reviews %}
+	<aside class="modal fade" id="reviewModal{{ review.pk }}" tabindex="-1" aria-labelledby="reviewModalLabel{{ review.pk }}" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title fw-bold" id="reviewModalLabel{{ review.pk }}">«{{ review.title }}»</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p class="fs_24">{{ review.text|linebreaks }}</p>
+				</div>
+				<div class="modal-footer">
+					<span class="fw-bold">{{ review.author_name }}</span>
+					<span>{{ review.city }}</span>
+				</div>
+			</div>
+		</div>
+	</aside>
+	{% endfor %}
 </article>
+{% endif %}
 {% endblock %}
 
 {% block footer_promo %}
