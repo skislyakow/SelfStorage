@@ -15,6 +15,7 @@ urlpatterns = [
     path("", views.HomeView.as_view(), name="home"),
     path("faq/", views.FaqView.as_view(), name="faq"),
     path("storage-rules/", views.StorageRulesView.as_view(), name="storage_rules"),
+    path("privacy/", views.PrivacyView.as_view(), name="privacy"),
     path("warehouses/", include("apps.warehouses.urls")),
     path("orders/", include("apps.rentals.urls")),
     path("accounts/", include("apps.users.urls")),

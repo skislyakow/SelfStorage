@@ -11,3 +11,7 @@ class FaqView(TemplateView):
 
 class StorageRulesView(TemplateView):
     template_name = "storage_rules.html"
+
+
+class PrivacyView(TemplateView):
+    template_name = "privacy.html"

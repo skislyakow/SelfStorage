@@ -43,7 +43,7 @@
 				</a></p>
 				<div class="collapse" id="collapse15">
 					<span>Мы предлагаем широкий выбор боксов разных размеров площадью от 1 до 50 м2. Выбирая бокс, обратите внимание на высоту потолков, параметры бокса и дверного проёма, а чтобы точно не ошибиться с выбором, ознакомьтесь с нашими материалами на странице
-						<a href="#" class="SelfStorage_orange">Как выбрать бокс</a> или получите консультацию специалиста.</span>
+						<a href="{% url 'warehouse_list' %}" class="SelfStorage_orange">Как выбрать бокс</a> или получите консультацию специалиста.</span>
 				</div>
 				<p><a class="fs_24 SelfStorage_grey text-decoration-none" data-bs-toggle="collapse" href="#collapse16" role="button" aria-expanded="false" aria-controls="collapseExample">
 					Что нельзя хранить в боксах SelfStorage?
@@ -75,9 +75,9 @@
 				<div class="collapse" id="collapse18">
 					<p>Вы можете перевезти вещи самостоятельно или воспользоваться услугами доставки:</p>
 					<ul>
-						<li><a href="#" class="SelfStorage_orange">SelfStorage</a>: закажите услугу перевозки вещей под ключ, а мы бережно упакуем, погрузим и перевезем ваши вещи на склад.</li>
-						<li><a href="#" class="SelfStorage_orange">Яндекс Go</a>: закажите грузовое такси, чтобы перевезти вещи в самые сжатые сроки.</li>
-						<li><a href="#" class="SelfStorage_orange">Яндекс.Драйв</a>: воспользуйтесь услугами грузового каршеринга, чтобы перевезти вещи самостоятельно.</li>
+						<li>SelfStorage: закажите услугу перевозки вещей под ключ, а мы бережно упакуем, погрузим и перевезем ваши вещи на склад.</li>
+						<li><a href="https://go.yandex/ru" target="_blank" rel="noopener" class="SelfStorage_orange">Яндекс Go</a>: закажите грузовое такси, чтобы перевезти вещи в самые сжатые сроки.</li>
+						<li><a href="https://drive.yandex.ru" target="_blank" rel="noopener" class="SelfStorage_orange">Яндекс.Драйв</a>: воспользуйтесь услугами грузового каршеринга, чтобы перевезти вещи самостоятельно.</li>
 					</ul>
 				</div>
 			</div>
@@ -221,16 +221,15 @@
 		<div class="d-flex flex-column align-items-center">
 			<h1 class="text-white text-center fw-bold mb-4">Остались вопросы?</h1>
 			<h4 class="text-white text-center fw-light">Оставьте заявку и наши менеджеры свяжутся с вами в ближайшее время</h4>
-			<form class="row my-4" method="post" action="#">
-				{% csrf_token %}
+			<form class="row my-4" method="get" action="{% url 'warehouse_list' %}">
 				<div class="col-12 col-lg-6">
-					<input type="email" required name="email" class="form-control border-8 mb-4 me-3 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Укажите ваш e-mail">
+					<input type="email" required class="form-control border-8 mb-4 me-3 py-3 px-5 border-0 fs_24 SelfStorage__bg_lightgrey" placeholder="Укажите ваш e-mail">
 				</div>
 				<div class="col-12 col-lg-6">
 					<button type="submit" class="btn w-100 border-8 py-3 px-5 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange">Рассчитать стоимость</button>
 				</div>
 			</form>
-			<span class="text-white text-center fw-light">Нажимая на кнопку, вы подтверждаете свое <a href="#" class="text-white">согласие на обработку персональных данных</a></span>
+			<span class="text-white text-center fw-light">Нажимая на кнопку, вы подтверждаете свое <a href="{% url 'privacy' %}" class="text-white">согласие на обработку персональных данных</a></span>
 		</div>
 	</div>
 </aside>

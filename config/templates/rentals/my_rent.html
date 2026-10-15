@@ -9,7 +9,10 @@
 		<button class="ps-0 btn bg-white fs_24 shadow-none SelfStorage_orange SelfStorage_tab active" id="LK-tab" data-bs-toggle="pill" data-bs-target="#LK" type="button" role="tab" aria-controls="LK" aria-selected="true">Личный кабинет</button>
 		<button class="ps-0 btn bg-white fs_24 shadow-none SelfStorage_grey SelfStorage_tab" id="Rent-tab" data-bs-toggle="pill" data-bs-target="#Rent" type="button" role="tab" aria-controls="Rent" aria-selected="false">Моя аренда</button>
 		<a href="{% url 'faq' %}" class="btn fs_24 shadow-none text-decoration-none SelfStorage_grey SelfStorage_tab">FAQ</a>
-		<a href="#" class="btn fs_24 shadow-none text-decoration-none SelfStorage_grey SelfStorage_tab">Выйти</a>
+		<form method="post" action="{% url 'users:logout' %}">
+			{% csrf_token %}
+			<button type="submit" class="btn fs_24 shadow-none text-decoration-none SelfStorage_grey SelfStorage_tab border-0 bg-transparent">Выйти</button>
+		</form>
 	</div>
 	<div class="col-lg-9">
 		<div class="card tab-content p-5">
@@ -107,14 +110,14 @@
 						{% elif order.status == 'overdue' or order.status == 'finished' %}
 						<div class="fs_24 SelfStorage_orange mb-2">Срок аренды истёк — бокс недоступен</div>
 						{% endif %}
-						<a href="#" class="SelfStorage_orange">Нужна помощь?</a>
+						<a href="{% url 'faq' %}" class="SelfStorage_orange">Нужна помощь?</a>
 					</div>
 				</div>
 				{% endfor %}
 				{% else %}
 				<h4 class="SelfStorage_grey my-5">У вас еще нет аренды :(<br>Но вы можете арендовать свой первый бокс по привлекательной цене прямо сейчас</h4>
 				<div><a href="{% url 'warehouse_list' %}" class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange mb-3">Арендовать бокс</a></div>
-				<a href="#" class="SelfStorage_orange">Нужна помощь?</a>
+				<a href="{% url 'faq' %}" class="SelfStorage_orange">Нужна помощь?</a>
 				{% endif %}
 			</div>
 		</div>
