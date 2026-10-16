@@ -155,9 +155,11 @@ def yookassa_webhook(request):
                     order = payment.order
                     _mark_paid(payment, order)
                 else:
-                    print(f"Платёж Юмани {payment_id} не найден в SelfStorage")
+                    logger.warning(
+                        "Платёж Юмани %s не найден в SelfStorage", payment_id
+                    )
             return JsonResponse({"status": "ok"})
         except Exception as e:
-            print(f"Ошибка webhook Юмани: {e}")
+            logger.exception("Ошибка webhook Юмани: %s", e)
             return JsonResponse({"error": str(e)}, status=400)
     return JsonResponse({"error": "POST required"}, status=400)
