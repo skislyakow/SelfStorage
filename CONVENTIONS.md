@@ -21,6 +21,8 @@
 | `rentals:wizard` | Мастер заказа (4 шага) | rentals | — |
 | `profile:my_rent` | Личный кабинет | rentals | — |
 | `box-access/<pk>/` (`qr_access`) | QR-доступ к боксу (открытие по QR) | rentals | `pk` |
+| `notifications:list` | Список уведомлений | notifications | — |
+| `notifications:read_all` | Отметить все прочитанными (POST) | notifications | — |
 | `owner:panel` | Панель владельца | rentals | — |
 
 ## 2. Переменные контекста шаблонов
@@ -50,6 +52,9 @@
 - `orders` — аренды пользователя.
 - Для каждого заказа: `items_text` (список вещей) ИЛИ `area`+`period` (площадь и период), `qr_code` (URL/путь к qr.png), `status`.
 
+### `notifications:list`
+- `notifications` — список уведомлений пользователя.
+
 ### `owner:panel`
 - `deliveries` — заявки на доставку с `client_address`, `phone`, `status`.
 - `overdue_orders` — просроченные заказы с телефонами владельцев боксов.
@@ -64,7 +69,14 @@
 | `payment_succeeded` | `Payment` | успешный платёж | rentals: перевести заказ в `active`, освободить бронь |
 | `order_overdue` | `RentalOrder` | истёк срок | notifications: письмо о просрочке и тарифе 6 мес |
 
-## 4. Прочее
+## 4. Глобальные переменные (context processor)
+
+Доступны во всех шаблонах через `apps.notifications.context_processors.notifications`:
+
+- `unread_notifications` — количество непрочитанных уведомлений пользователя (0 для анонимного).
+- `recent_notifications` — 5 последних уведомлений пользователя (список объектов `Notification`).
+
+## 5. Прочее
 
 - Логин пользователя — `email` (`AUTH_USER_MODEL = apps.users.User`).
 - Вычисляемые значения («14 из 390», «от 3034 ₽») не храним в БД — считаем на лету.

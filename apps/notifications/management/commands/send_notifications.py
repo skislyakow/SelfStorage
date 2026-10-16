@@ -3,9 +3,11 @@ from datetime import timedelta
 
 from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
+from django.urls import reverse
 from django.utils import timezone
 
 from apps.notifications.email import greeting, plural_days
+from apps.notifications.services import notify
 from apps.rentals.models import RentalOrder
 
 logger = logging.getLogger(__name__)
@@ -26,10 +28,16 @@ class Command(BaseCommand):
                     send_mail(
                         "Заканчивается срок аренды!",
                         f"{greeting(order.user)} срок аренды бокса "
-                        f"заканчивается через {days} дней.",
+                        f"заканчивается через {days} {plural_days(days)}.",
                         None,
                         [order.user.email],
                         fail_silently=False,
+                    )
+                    notify(
+                        order.user,
+                        f"Срок аренды бокса №{order.box.number} заканчивается "
+                        f"через {days} {plural_days(days)}.",
+                        reverse("my_rent"),
                     )
                 except Exception:
                     logger.exception(
@@ -65,6 +73,12 @@ class Command(BaseCommand):
                         None,
                         [order.user.email],
                         fail_silently=False,
+                    )
+                    notify(
+                        order.user,
+                        f"Срок аренды бокса №{order.box.number} просрочен — "
+                        f"продлите аренду или заберите вещи.",
+                        reverse("my_rent"),
                     )
                     order.last_overdue_notified = today
                 except Exception:

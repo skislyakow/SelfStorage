@@ -5,7 +5,9 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.urls import reverse
 
+from apps.notifications.models import Notification
 from apps.payments.models import Payment
 from apps.promotions.models import PromoCode
 from apps.rentals.models import DeliveryRequest, RentalOrder
@@ -184,6 +186,30 @@ class Command(BaseCommand):
 
         generate_qr(order1)
         generate_qr(order2)
+
+        # Уведомления в кабинете — колокольчик в шапке (2 непрочитанных, 1 прочитанное)
+        Notification.objects.create(
+            user=user,
+            text=(
+                f"Оплата получена: заказ #{order1.pk}, "
+                f"бокс №{box_ekat1.number} ({box_ekat1.area} м²)."
+            ),
+            url=reverse("my_rent"),
+        )
+        Notification.objects.create(
+            user=user,
+            text=(f"Срок аренды бокса №{box_ekat2.number} заканчивается через 7 дней."),
+            url=reverse("my_rent"),
+        )
+        Notification.objects.create(
+            user=user,
+            text=(
+                f"Оплата получена: заказ #{order2.pk}, "
+                f"бокс №{box_ekat2.number} ({box_ekat2.area} м²)."
+            ),
+            url=reverse("my_rent"),
+            is_read=True,
+        )
 
         DeliveryRequest.objects.create(
             order=order1,

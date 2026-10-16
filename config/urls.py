@@ -18,6 +18,7 @@ urlpatterns = [
     path("privacy/", views.PrivacyView.as_view(), name="privacy"),
     path("warehouses/", include("apps.warehouses.urls")),
     path("orders/", include("apps.rentals.urls")),
+    path("notifications/", include("apps.notifications.urls")),
     path("accounts/", include("apps.users.urls")),
     path("", include("apps.payments.urls")),
 ]

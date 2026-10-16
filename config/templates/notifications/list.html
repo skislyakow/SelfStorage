@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Уведомления — SelfStorage{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+	<h1 class="fw-bold mb-2 mb-sm-0">Уведомления</h1>
+	{% if unread_notifications %}
+	<form method="post" action="{% url 'notifications:read_all' %}">
+		{% csrf_token %}
+		<button type="submit" class="btn border-8 text-white SelfStorage__bg_orange SelfStorage__btn2_orange px-4">Отметить все прочитанными</button>
+	</form>
+	{% endif %}
+</div>
+
+<div class="list-group">
+	{% for note in notifications %}
+	<div class="list-group-item border-8 mb-2 {% if not note.is_read %}SelfStorage__bg_lightgrey{% endif %}">
+		<div class="d-flex justify-content-between align-items-start gap-3">
+			<div>
+				<p class="mb-1 {% if not note.is_read %}fw-bold{% endif %}">{{ note.text }}</p>
+				{% if note.url %}
+				<a href="{{ note.url }}" class="SelfStorage_green text-decoration-none">Перейти в личный кабинет</a>
+				{% endif %}
+			</div>
+			<span class="SelfStorage_grey text-nowrap">{{ note.created_at|date:"d.m.Y H:i" }}</span>
+		</div>
+	</div>
+	{% empty %}
+	<p class="SelfStorage_grey fs_24">Уведомлений пока нет.</p>
+	{% endfor %}
+</div>
+{% endblock %}
