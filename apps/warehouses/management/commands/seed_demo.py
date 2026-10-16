@@ -4,16 +4,14 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
 from apps.payments.models import Payment
 from apps.promotions.models import PromoCode
 from apps.rentals.models import DeliveryRequest, RentalOrder
 from apps.rentals.services import generate_qr
+from apps.users.models import User
 from apps.warehouses.models import Box, Review, Warehouse
-
-User = get_user_model()
 
 # Склады — точно по вёрстке boxes.html (город, адрес, t, потолок, база цены, картинка)
 WAREHOUSES = [
