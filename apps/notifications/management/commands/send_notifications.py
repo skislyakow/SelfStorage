@@ -33,7 +33,7 @@ class Command(BaseCommand):
                     )
                 except Exception:
                     logger.exception(
-                        "Не удалось отправить напоминание для заказа %s", order.id
+                        "Не удалось отправить напоминание для заказа %s", order.pk
                     )
 
         # Просроченные: переводим в overdue и напоминаем раз в месяц, начиная с 1-го дня
@@ -70,6 +70,6 @@ class Command(BaseCommand):
                 except Exception:
                     logger.exception(
                         "Не удалось отправить письмо о просрочке для заказа %s",
-                        order.id,
+                        order.pk,
                     )
             order.save()

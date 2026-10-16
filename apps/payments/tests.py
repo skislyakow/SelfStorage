@@ -51,7 +51,7 @@ class PaymentFlowTests(TestCase):
             mock_pay.confirmation.confirmation_url = "https://yookassa.ru/pay/yoo_123"
             MockYoo.create.return_value = mock_pay
 
-            resp = self.client.get(reverse("payment_create", args=[self.order.id]))
+            resp = self.client.get(reverse("payment_create", args=[self.order.pk]))
 
             self.assertEqual(resp.status_code, 302)
             self.assertEqual(resp.url, "https://yookassa.ru/pay/yoo_123")
@@ -62,12 +62,12 @@ class PaymentFlowTests(TestCase):
     def test_create_payment_requires_owner(self):
         other = User.objects.create_user(email="other@test.ru", password="x")
         self.client.force_login(other)
-        resp = self.client.get(reverse("payment_create", args=[self.order.id]))
+        resp = self.client.get(reverse("payment_create", args=[self.order.pk]))
         self.assertEqual(resp.status_code, 302)
 
     def test_create_payment_disabled_without_credentials(self):
         with override_settings(YOOKASSA_SHOP_ID="", YOOKASSA_SECRET_KEY=""):
-            resp = self.client.get(reverse("payment_create", args=[self.order.id]))
+            resp = self.client.get(reverse("payment_create", args=[self.order.pk]))
             self.assertEqual(resp.status_code, 400)
             data = json.loads(resp.content)
             self.assertEqual(data["status"], "error")
@@ -118,7 +118,7 @@ class PaymentFlowTests(TestCase):
                 mock_pay.status = "succeeded"
                 MockYoo.find_one.return_value = mock_pay
 
-                resp = self.client.get(reverse("payment_success", args=[self.order.id]))
+                resp = self.client.get(reverse("payment_success", args=[self.order.pk]))
 
                 self.assertEqual(resp.status_code, 302)
         self.order.refresh_from_db()
