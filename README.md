@@ -62,6 +62,8 @@
 
 ![Вход](docs/img/login.png)
 
+![Панель владельца — дашборд заказов, выручки и заявок на доставку](docs/img/owner_dashboard.png)
+
 ## Как запустить
 
 ```powershell
