@@ -24,4 +24,22 @@
 ```bash
 curl -s -H "Host: selfstorage.kislyakov.pro" http://127.0.0.1:8003/orders/my-rent/ -o /dev/null -w "%{http_code}"
 # ожидаем 302
+
+curl -sI https://selfstorage.kislyakov.pro/ | grep -E 'Strict-Transport|Content-Security'
+# ожидаем max-age=31536000 и default-src 'self' (HSTS и CSP)
 ```
+
+## Если деплой упал на `git pull`
+
+У сервера только одна задача — отдавать `origin/main`, своих коммитов там не
+предполагается. Если историю в репозитории переписали (force-push/rebase),
+`git pull` на сервере отказывается мержить разошедшиеся ветки и деплой падает.
+Чинится одной командой с VPS:
+
+```bash
+cd /opt/selftorage && git reset --hard origin/main && bash deploy.sh
+```
+
+`.env`, `db.sqlite3` и `media/` под gitignore — reset их не трогает. В
+workflow стоит `git pull --ff-only`: такая ситуация падает сразу с понятной
+ошибкой, а не на слиянии.

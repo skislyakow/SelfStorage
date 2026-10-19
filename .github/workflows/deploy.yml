@@ -32,5 +32,7 @@ jobs:
           script_stop: true
           script: |
             cd /opt/selftorage
-            git pull
+            # Только fast-forward: сервер не хранит своих коммитов, а после
+            # переписанной истории обычный pull падает на слиянии веток.
+            git pull --ff-only
             bash /opt/selftorage/deploy.sh
