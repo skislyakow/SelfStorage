@@ -58,4 +58,5 @@
 - `67e90c9` — `deploy.yml`: деплой переведён на `workflow_run` после успешного CI + `concurrency`, параллельные запуски не накладываются.
 - `85e7282` — rentals: бизнес-правила доступа к боксу и расчёт стоимости вынесены из `views.py` в `services.py`, +8 тестов сервисов.
 - `05aba7f` — **скриншоты для README**: `warehouses.png` обновлён со стенда, добавлен `owner_dashboard.png` (дашборд владельца со входом через CDP), README дополнен, задача в разделе «Витрина» закрыта.
+- `5e2c561`, `075bc9c`, `9c7b9bd` — **срез Pylance/pyright до нуля**: аннотация `objects` в `users/models`, шесть диагностик в notifications/users (Meta наследует `AbstractUser.Meta`, `headers["Location"]`, assert-сужение), затем оставшиеся 40 по всему проекту (`order.id` → `pk`, `cast(User)`, прямой импорт `User`, `str()` для body письма, наследие Meta в формах). `type: ignore` — только на шуме библиотек без py.typed (django-environ, qrcode, yookassa, formtools). Итог: pyright 0 ошибок, mypy/ruff чистые, 87 тестов.
 - Закрыто ранее: `seed_demo` на стенде — осознанное поведение витрины, описано в `docs/deployment.md`.
