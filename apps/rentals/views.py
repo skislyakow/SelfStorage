@@ -1,6 +1,4 @@
-from calendar import monthrange
 from datetime import date
-from decimal import Decimal
 from typing import ClassVar, cast
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,52 +8,11 @@ from django.views.generic import DetailView, ListView
 from formtools.wizard.views import SessionWizardView
 
 from apps.promotions.models import PromoCode
+from apps.rentals import services
 from apps.rentals.forms import BoxForm, ContactsForm, DeliveryForm
 from apps.rentals.models import DeliveryRequest, RentalOrder
 from apps.users.models import User
 from apps.warehouses.models import Box
-
-
-def add_months(start, months):
-    total = start.month - 1 + months
-    year = start.year + total // 12
-    month = total % 12 + 1
-    return date(year, month, min(start.day, monthrange(year, month)[1]))
-
-
-def calculate_amount(box, rental_months, start_date, promo):
-    full_price = box.price_per_month
-    if promo is None:
-        return {
-            "total": full_price * rental_months,
-            "discounted_months": 0,
-            "full_months": rental_months,
-            "discounted_month_price": full_price,
-            "full_month_price": full_price,
-        }
-    discount = promo.discount_percent / Decimal("100")
-    discounted_price = (full_price * (Decimal("1") - discount)).quantize(
-        Decimal("0.01")
-    )
-    discounted_months = 0
-    full_months = 0
-    total = Decimal("0")
-    for i in range(rental_months):
-        m_start = add_months(start_date, i)
-        m_end = add_months(start_date, i + 1)
-        if m_start <= promo.valid_to and m_end > promo.valid_from:
-            total += discounted_price
-            discounted_months += 1
-        else:
-            total += full_price
-            full_months += 1
-    return {
-        "total": total,
-        "discounted_months": discounted_months,
-        "full_months": full_months,
-        "discounted_month_price": discounted_price,
-        "full_month_price": full_price,
-    }
 
 
 class OrderWizard(LoginRequiredMixin, SessionWizardView):
@@ -88,7 +45,7 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
         data = self.get_all_cleaned_data()
         months = int(data["rental_months"])
         start = date.today()
-        end = add_months(start, months)
+        end = services.add_months(start, months)
 
         box = data["box"]
         promo = None
@@ -98,7 +55,7 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
             promo = PromoCode.objects.filter(
                 code__iexact=promo_code, valid_from__lte=today, valid_to__gte=today
             ).first()
-        calc = calculate_amount(box, months, start, promo)
+        calc = services.calculate_amount(box, months, start, promo)
         order = RentalOrder.objects.create(
             user=self.request.user,
             box=box,
@@ -153,7 +110,7 @@ class MyRentView(LoginRequiredMixin, ListView):
 
 
 class BoxAccessView(DetailView):
-    """QR-доступ: переход по QR открывает бокс (заглушка логики).
+    """QR-доступ: переход по QR открывает бокс (правило — в services.open_box).
 
     Доступно по ссылке/QR любому, у кого есть QR (семья, охрана). Открытие
     возможно только при активной аренде (срок не вышел).
@@ -165,17 +122,14 @@ class BoxAccessView(DetailView):
 
     def get(self, request, *args, **kwargs):
         order = self.get_object()
-        if order.status == "active" and order.access_status != "open":
-            order.access_status = "open"
-            order.save(update_fields=["access_status"])
+        services.open_box(order)
         return super().get(request, *args, **kwargs)
 
 
 def box_close(request, pk):
-    """Закрыть бокс (заглушка логики): любой, кому доступен бокс."""
+    """Закрыть бокс: любой, кому доступен бокс (правило — в services.close_box)."""
     order = get_object_or_404(RentalOrder, pk=pk)
-    order.access_status = "closed"
-    order.save(update_fields=["access_status"])
+    services.close_box(order)
     if request.user.is_authenticated:
         return redirect("my_rent")
     return redirect("qr_access", pk=pk)
