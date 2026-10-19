@@ -3,7 +3,7 @@
 Сервис аренды складских боксов: клиент выбирает склад и бокс, оформляет аренду онлайн, оплачивает через ЮKassa и получает QR-код для доступа к боксу.
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
-![Django](https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.2.17-092E20?logo=django&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.0.2-7952B3?logo=bootstrap&logoColor=white)
 ![uv](https://img.shields.io/badge/deps-uv-DE5FE9?logo=uv&logoColor=white)
@@ -40,7 +40,7 @@
 
 | Слой | Технологии |
 |---|---|
-| Backend | Python 3.12, Django 5.2 — кастомная модель пользователя, class-based views, ORM и миграции, Django Admin, signals, middleware, management-команды |
+| Backend | Python 3.12, Django 5.2.17 — кастомная модель пользователя, class-based views, ORM и миграции, Django Admin, signals, middleware, management-команды |
 | Данные | SQLite (осознанный выбор для демо-стенда: база — один файл, отдельный сервер БД не нужен) |
 | Фронтенд | Django Templates, Bootstrap 5.0.2, собственный CSS, vanilla JS |
 | Оформление заказа | django-formtools (`SessionWizardView`), валидация через Django Forms |
