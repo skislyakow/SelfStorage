@@ -9,10 +9,10 @@ Middleware `apps/rentals/middleware.py` сохраняет в сессии па�
 ## Примеры рекламных ссылок
 | Источник | Ссылка |
 |---|---|
-| ВКонтакте | `https://selftorage.kislyakov.pro/?utm_source=vk` |
-| Google Ads | `https://selftorage.kislyakov.pro/?utm_source=google` |
-| Яндекс.Директ (на бокс) | `https://selftorage.kislyakov.pro/rentals/wizard/?box=1&utm_source=yandex` |
-| Facebook | `https://selftorage.kislyakov.pro/?utm_source=facebook&utm_campaign=vesna` |
-| Instagram (алиас src) | `https://selftorage.kislyakov.pro/?src=instagram` |
+| ВКонтакте | `https://selfstorage.kislyakov.pro/?utm_source=vk` |
+| Google Ads | `https://selfstorage.kislyakov.pro/?utm_source=google` |
+| Яндекс.Директ (на бокс) | `https://selfstorage.kislyakov.pro/rentals/wizard/?box=1&utm_source=yandex` |
+| Facebook | `https://selfstorage.kislyakov.pro/?utm_source=facebook&utm_campaign=vesna` |
+| Instagram (алиас src) | `https://selfstorage.kislyakov.pro/?src=instagram` |
 
 После `seed_demo` есть тестовые заказы с метками `vk`, `google`, `direct`, `demo`.

@@ -11,7 +11,7 @@ env.read_env(str(BASE_DIR / ".env"))
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = env.list(
-    "ALLOWED_HOSTS", default=["selftorage.kislyakov.pro", "localhost", "127.0.0.1"]
+    "ALLOWED_HOSTS", default=["selfstorage.kislyakov.pro", "localhost", "127.0.0.1"]
 )
 
 INSTALLED_APPS = [
