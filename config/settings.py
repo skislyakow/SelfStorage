@@ -10,8 +10,11 @@ env.read_env(str(BASE_DIR / ".env"))
 
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
+# Примечание к type: ignore ниже: у django-environ нет py.typed, pyright
+# выводит default как NoValue и жалуется на значения по умолчанию.
 ALLOWED_HOSTS = env.list(
-    "ALLOWED_HOSTS", default=["selfstorage.kislyakov.pro", "localhost", "127.0.0.1"]
+    "ALLOWED_HOSTS",
+    default=["selfstorage.kislyakov.pro", "localhost", "127.0.0.1"],  # type: ignore
 )
 
 INSTALLED_APPS = [
@@ -64,7 +67,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": env("DB_PATH", default=str(BASE_DIR / "db.sqlite3")),
+        "NAME": env("DB_PATH", default=str(BASE_DIR / "db.sqlite3")),  # type: ignore
     }
 }
 
@@ -95,22 +98,26 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 EMAIL_BACKEND = env(
-    "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
+    "EMAIL_BACKEND",
+    default="django.core.mail.backends.console.EmailBackend",  # type: ignore
 )
-EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")  # type: ignore
 EMAIL_PORT = env.int("EMAIL_PORT", default=587)
-EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")  # type: ignore
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")  # type: ignore
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
 # REG.RU требует, чтобы FROM был авторизованным ящиком (реальным), иначе
 # релей отклоняется с 451. Поэтому по умолчанию — реальный ящик, а не noreply@.
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="selfstorage@kislyakov.pro")
+DEFAULT_FROM_EMAIL = env(
+    "DEFAULT_FROM_EMAIL",
+    default="selfstorage@kislyakov.pro",  # type: ignore
+)
 
 # YooKassa (Юмани) — приём оплат за аренду боксов
-YOOKASSA_SHOP_ID = env("YOOKASSA_SHOP_ID", default="")
-YOOKASSA_SECRET_KEY = env("YOOKASSA_SECRET_KEY", default="")
-SITE_URL = env("SITE_URL", default="https://selfstorage.kislyakov.pro")
+YOOKASSA_SHOP_ID = env("YOOKASSA_SHOP_ID", default="")  # type: ignore
+YOOKASSA_SECRET_KEY = env("YOOKASSA_SECRET_KEY", default="")  # type: ignore
+SITE_URL = env("SITE_URL", default="https://selfstorage.kislyakov.pro")  # type: ignore
 
 # Куда уходит аноним из login_required/LoginRequiredMixin. Адрес берём из
 # URLconf, а не строкой: со строкой "/login/" редирект вёл на 404, потому что

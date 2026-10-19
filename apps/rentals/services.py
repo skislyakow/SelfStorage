@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.urls import reverse
+from qrcode import constants
 
 from apps.promotions.models import PromoCode
 from apps.rentals.models import RentalOrder
@@ -26,7 +27,7 @@ def generate_qr(order):
     data = qr_payload(order)
     qr = qrcode.QRCode(
         version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        error_correction=constants.ERROR_CORRECT_L,
         box_size=10,
         border=4,
     )
@@ -35,7 +36,9 @@ def generate_qr(order):
 
     img = qr.make_image(fill_color="black", back_color="white")
     buffer = BytesIO()
-    img.save(buffer, format="PNG")
+    # qrcode без py.typed: BaseImage.save объявлен как save(stream, kind=None),
+    # а у PIL-реализации есть аргумент format — ложное срабатывание pyright.
+    img.save(buffer, format="PNG")  # type: ignore
 
     filename = f"qr_{order.pk}.png"
     path = os.path.join("qr", filename)

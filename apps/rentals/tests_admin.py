@@ -39,7 +39,7 @@ class OwnerDashboardTests(TestCase):
         admin = User.objects.get(email="admin@selfstorage.ru")
         self.client.force_login(admin)
         dr = DeliveryRequest.objects.filter(status="new").first()
-        self.assertIsNotNone(dr)
+        assert dr is not None
         url = "/admin/rentals/deliveryrequest/"
         resp = self.client.post(
             url,

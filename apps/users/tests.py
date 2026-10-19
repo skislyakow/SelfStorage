@@ -163,9 +163,10 @@ class PasswordResetTests(TestCase):
         self.assertEqual(resp["Location"], reverse("users:password_reset_done"))
 
         self.assertEqual(len(mail.outbox), 1)
-        body = mail.outbox[0].body
+        # body у EmailMessage типизирован как str | _StrPromise — приводим к str.
+        body = str(mail.outbox[0].body)
         match = re.search(r"/accounts/password-reset/([^/]+)/([^/]+)/", body)
-        self.assertIsNotNone(match)
+        assert match is not None
         uidb64, token = match.group(1), match.group(2)
 
         confirm_url = reverse(

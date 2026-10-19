@@ -26,7 +26,7 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
             if box_id:
                 initial["box"] = box_id
         elif step == "2":
-            user = self.request.user
+            user = cast(User, self.request.user)
             initial["first_name"] = user.first_name
             initial["phone"] = user.phone
         return initial
@@ -36,7 +36,9 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
         if step == "0":
             box_id = self.request.GET.get("box")
             if box_id:
-                form.fields["box"].queryset = Box.objects.filter(
+                # formtools без py.typed: pyright типизирует get_form(...) как
+                # formset, а form.fields["box"] — как Field без queryset.
+                form.fields["box"].queryset = Box.objects.filter(  # type: ignore
                     pk=box_id, status="free"
                 )
         return form

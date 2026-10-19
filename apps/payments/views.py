@@ -60,12 +60,12 @@ def create_payment(request, order_id):
                 "confirmation": {
                     "type": "redirect",
                     "return_url": (
-                        f"{settings.SITE_URL}/orders/payment-success/{order.id}/"
+                        f"{settings.SITE_URL}/orders/payment-success/{order.pk}/"
                     ),
                 },
-                "description": f"Аренда бокса №{order.box.number} — заказ #{order.id}",
+                "description": f"Аренда бокса №{order.box.number} — заказ #{order.pk}",
                 "metadata": {
-                    "order_id": order.id,
+                    "order_id": order.pk,
                     "user_email": order.user.email,
                 },
             }
@@ -82,7 +82,8 @@ def create_payment(request, order_id):
         payment.amount = order.amount
     payment.save()
 
-    return redirect(yoo_payment.confirmation.confirmation_url)
+    # У yookassa нет py.typed: pyright выводит confirmation как None.
+    return redirect(yoo_payment.confirmation.confirmation_url)  # type: ignore
 
 
 @login_required

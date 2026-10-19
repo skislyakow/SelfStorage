@@ -91,6 +91,7 @@ class SeedReviewsTests(TestCase):
         self.assertEqual(Review.objects.filter(is_published=True).count(), 2)
         self.assertEqual(Review.objects.filter(is_published=False).count(), 1)
         first = Review.objects.order_by("created_at").first()
+        assert first is not None
         self.assertTrue(first.photo)
 
     def test_seed_is_idempotent(self):

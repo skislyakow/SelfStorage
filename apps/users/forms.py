@@ -33,7 +33,7 @@ class CustomUserCreationForm(UserCreationForm):
         ),
     )
 
-    class Meta:
+    class Meta(UserCreationForm.Meta):
         model = User
         fields = ("first_name", "email", "phone", "password1", "password2")
         widgets: ClassVar[dict] = {
@@ -68,9 +68,11 @@ class CustomSetPasswordForm(SetPasswordForm):
 
 
 class CustomUserChangeForm(UserChangeForm):
-    class Meta:
+    class Meta(UserChangeForm.Meta):
         model = User
-        fields = (
+        # Стабы UserChangeForm.Meta объявляют fields как str ("__all__"):
+        # несовместимость только в типах, Django принимает и строку, и кортеж.
+        fields = (  # type: ignore
             "first_name",
             "email",
             "phone",

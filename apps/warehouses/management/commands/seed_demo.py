@@ -220,6 +220,7 @@ class Command(BaseCommand):
 
         # Просроченный заказ — для обзвона владельцем
         overdue_box = Box.objects.filter(warehouse=warehouses["Москва"]).first()
+        assert overdue_box is not None
         RentalOrder.objects.create(
             user=user,
             box=overdue_box,
@@ -233,6 +234,7 @@ class Command(BaseCommand):
 
         # Продлён на 6 мес (по техническому заданию — тоже требует звонка)
         ext_box = Box.objects.filter(warehouse=warehouses["Пушкино"]).first()
+        assert ext_box is not None
         RentalOrder.objects.create(
             user=user,
             box=ext_box,
@@ -352,6 +354,7 @@ class Command(BaseCommand):
         for i, (status, address, reason) in enumerate(DELIVERY_DEMO):
             wh = wh_list[i % len(wh_list)]
             demo_box = Box.objects.filter(warehouse=wh).exclude(pk=box_ekat1.pk).first()
+            assert demo_box is not None
             demo_order = RentalOrder.objects.create(
                 user=clients[emails[i]],
                 box=demo_box,

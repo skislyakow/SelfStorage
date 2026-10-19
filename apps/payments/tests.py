@@ -54,7 +54,9 @@ class PaymentFlowTests(TestCase):
             resp = self.client.get(reverse("payment_create", args=[self.order.pk]))
 
             self.assertEqual(resp.status_code, 302)
-            self.assertEqual(resp.url, "https://yookassa.ru/pay/yoo_123")
+            self.assertEqual(
+                resp.headers["Location"], "https://yookassa.ru/pay/yoo_123"
+            )
             payment = Payment.objects.get(order=self.order)
             self.assertEqual(payment.yookassa_id, "yoo_123")
             self.assertEqual(payment.status, "pending")
@@ -142,7 +144,9 @@ class PaymentFlowTests(TestCase):
         self.order.refresh_from_db()
         self.assertEqual(self.order.status, "active")
         self.assertTrue(self.order.qr_code)
-        full = os.path.join(tmp, self.order.qr_code.name)
+        qr_name = self.order.qr_code.name
+        assert qr_name is not None
+        full = os.path.join(tmp, qr_name)
         self.assertTrue(os.path.exists(full))
         self.assertEqual(
             self.order.qr_code.name, f"qr/qr_{self.order.pk}.png".replace("/", os.sep)
