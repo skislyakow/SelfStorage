@@ -18,6 +18,7 @@
 - Типы: uv run mypy .
 - Format: uv run ruff format .
 - Коммиты в `main` — через PR: прямой push отклоняется защитой ветки (PR обязателен, чеки `lint`/`types`/`test` должны пройти, force-push запрещён, правила действуют и на админа). Схема: ветка → push → PR → merge после зелёного CI.
+- Бейджи версий в README: Python/Django/Bootstrap сверяет тест `config/tests_readme.py` (с `.python-version`, `pyproject`, `base.html`) — при бампе версии README правится в том же PR. nginx-бейдж обновлять вручную: версии в репо нет, она живёт на VPS.
 
 ## Windows / PowerShell
 - Секрет в env: PowerShell `$env:SECRET_KEY="test-key"`, bash `SECRET_KEY=test-key`.
