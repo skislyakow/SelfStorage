@@ -1,7 +1,8 @@
 from apps.notifications.models import Notification
+from apps.users.models import User
 
 
-def notify(user, text, url=""):
+def notify(user: User | None, text: str, url: str = "") -> Notification | None:
     """Создать уведомление в кабинете.
 
     Вызывается рядом с отправкой письма: письмо может не дойти (нет SMTP,

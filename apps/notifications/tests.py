@@ -86,7 +86,7 @@ class SendNotificationsTests(TestCase):
         self.assertIn("1 день", mail.outbox[0].body)
 
     def test_overdue_monthly_sends(self):
-        RentalOrder.objects.create(
+        order = RentalOrder.objects.create(
             user=self.user,
             box=self.box,
             start_date=timezone.now().date() - timedelta(days=60),
@@ -94,7 +94,7 @@ class SendNotificationsTests(TestCase):
             status="active",
         )
         call_command("send_notifications")
-        order = RentalOrder.objects.first()
+        order.refresh_from_db()
         self.assertEqual(order.status, "overdue")
         self.assertEqual(order.last_overdue_notified, timezone.now().date())
         self.assertEqual(len(mail.outbox), 1)
@@ -163,6 +163,7 @@ class InAppNotificationTests(TestCase):
 
     def test_notify_creates_unread_notification(self):
         note = notify(self.user, "Оплата получена", url="/orders/my-rent/")
+        assert note is not None
         self.assertFalse(note.is_read)
         self.assertEqual(self.user.notifications.count(), 1)
 
@@ -178,6 +179,7 @@ class InAppNotificationTests(TestCase):
     def test_bell_counter_counts_only_own_unread(self):
         notify(self.user, "Моё непрочитанное")
         read_note = notify(self.user, "Моё прочитанное", url="/x/")
+        assert read_note is not None
         read_note.is_read = True
         read_note.save()
         notify(self.other, "Чужое непрочитанное")
@@ -191,7 +193,8 @@ class InAppNotificationTests(TestCase):
     def test_list_requires_login(self):
         response = self.client.get(reverse("notifications:list"))
         self.assertEqual(response.status_code, 302)
-        self.assertIn("login", response.url)
+        # url у редиректа в стабах клиента не типизирован, см. Location.
+        self.assertIn("login", response.headers["Location"])
 
     def test_list_shows_only_own_notifications(self):
         notify(self.user, "Моё уведомление")

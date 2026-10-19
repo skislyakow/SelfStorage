@@ -42,9 +42,13 @@ class User(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: ClassVar[list[str]] = []
 
-    class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
+    class Meta(AbstractUser.Meta):
+        # Наследуем, как django.contrib.auth.models.User: pyright сравнивает
+        # вложенные Meta номинально, и без наследования ругается на
+        # несовместимость с AbstractUser.Meta. abstract Django сбрасывает
+        # в False при создании AbstractUser — User остаётся конкретным.
+        verbose_name: ClassVar[str] = "Пользователь"
+        verbose_name_plural: ClassVar[str] = "Пользователи"
 
     def __str__(self):
         return self.email
