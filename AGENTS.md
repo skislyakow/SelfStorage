@@ -17,6 +17,7 @@
 - Lint: uv run ruff check . && uv run ruff format --check .
 - Типы: uv run mypy .
 - Format: uv run ruff format .
+- Коммиты в `main` — через PR: прямой push отклоняется защитой ветки (PR обязателен, чеки `lint`/`types`/`test` должны пройти, force-push запрещён, правила действуют и на админа). Схема: ветка → push → PR → merge после зелёного CI.
 
 ## Windows / PowerShell
 - Секрет в env: PowerShell `$env:SECRET_KEY="test-key"`, bash `SECRET_KEY=test-key`.
