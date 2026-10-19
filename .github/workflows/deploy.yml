@@ -1,11 +1,25 @@
 name: Deploy to VPS
 
+# Деплой только после успешного CI: на push в main он не запускается сам,
+# а ждёт завершения workflow CI с conclusion == success.
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
+
+# Параллельные деплои не накладываются: новый ждёт предыдущий,
+# но и не отменяет уже начатый (cancel-in-progress: false).
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
 
 jobs:
   deploy:
+    # Штатный прогон CI после push в main; падение CI или PR-прогон — не деплоим.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Deploy via SSH
