@@ -36,7 +36,9 @@ class User(AbstractUser):
     pd_consent = models.BooleanField("Согласие на обработку ПД", default=False)
 
     # Свой менеджер вместо django.contrib.auth.models.UserManager.
-    objects = UserManager()  # type: ignore[assignment,misc]
+    # Аннотация обязательна: без неё Pylance берёт ClassVar[UserManager[Self]]
+    # из стабов AbstractUser и требует username в create_user().
+    objects: ClassVar[UserManager] = UserManager()  # type: ignore[assignment,misc]
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: ClassVar[list[str]] = []
 
