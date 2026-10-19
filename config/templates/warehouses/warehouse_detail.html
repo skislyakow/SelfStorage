@@ -111,15 +111,5 @@
 	<p class="text-center SelfStorage_grey">По этому фильтру боксов не нашлось — попробуйте другой диапазон.</p>
 	{% endif %}
 </article>
-<script>
-  document.querySelectorAll('[data-wizard-next]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var target = btn.getAttribute('data-wizard-next');
-      ['#SignModal', '#RegModal'].forEach(function (sel) {
-        var inp = document.querySelector(sel + ' input[name="next"]');
-        if (inp) inp.value = target;
-      });
-    });
-  });
-</script>
+<script src="{% static 'js/auth-modal-next.js' %}"></script>
 {% endblock %}

@@ -17,6 +17,17 @@ ALLOWED_HOSTS = env.list(
     default=["selfstorage.kislyakov.pro", "localhost", "127.0.0.1"],  # type: ignore
 )
 
+# Прокси nginx терминирует TLS и шлёт X-Forwarded-Proto, gunicorn слушает
+# только 127.0.0.1:8003 — заголовку можно доверять. Без него приложение
+# за прокси считало бы запрос HTTP и не выставляло HSTS.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# HSTS: браузер запоминает «только HTTPS» на max-age (по умолчанию — год).
+# На стенде рабочий сертификат Let's Encrypt, но откатить долго: браузеры
+# держат max-age, поэтому включаем осознанно, kill-switch — 0 в .env.
+# includeSubDomains/preload не включаем: они бы распространились на все
+# *.kislyakov.pro, где HTTPS включён не везде.
+SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=31536000)
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -34,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "config.middleware.ContentSecurityPolicyMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

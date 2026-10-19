@@ -33,15 +33,7 @@
 							<input type="password" name="password" id="PASSWORD" class="form-control fs_24 ps-2 SelfStorage__input" value="••••••••" disabled>
 							<button type="submit" class="btn SelfStorage_green ps-1" id="save" style="display: none">Сохранить</button>
 							<a class="btn SelfStorage_orange ps-1" id="edit">Редактировать</a>
-							<script>
-								document.getElementById('edit').addEventListener('click', e => {
-									e.preventDefault()
-									document.getElementById('EMAIL').disabled = false
-									document.getElementById('PHONE').disabled = false
-									document.getElementById('edit').style.display = 'none'
-									document.getElementById('save').style.display = 'inline-block'
-								})
-							</script>
+							<script src="{% static 'js/profile-edit.js' %}"></script>
 						</form>
 					</div>
 				</div>

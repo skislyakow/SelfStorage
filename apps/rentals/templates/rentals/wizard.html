@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Мастер заказа — SelfStorage{% endblock %}
 {% block content %}
 <div class="container py-5">
@@ -38,20 +39,5 @@
 </div>
 {% endblock %}
 {% block scripts %}
-<script>
-  (function () {
-    function toggleAddress() {
-      var delivery = document.querySelector('input[name$="delivery_type"]:checked');
-      var addr = document.querySelector('input[name$="address"]');
-      if (!addr) return;
-      var show = !!(delivery && delivery.value !== "self");
-      addr.closest(".mb-3").style.display = show ? "" : "none";
-      addr.required = show;
-    }
-    document.addEventListener("change", function (e) {
-      if (e.target.name && e.target.name.endsWith("delivery_type")) toggleAddress();
-    });
-    document.addEventListener("DOMContentLoaded", toggleAddress);
-  })();
-</script>
+<script src="{% static 'js/delivery-address.js' %}"></script>
 {% endblock %}
