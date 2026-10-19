@@ -35,7 +35,7 @@
 
 ## Инфраструктура и процесс
 
-- [x] **P2 · Деплой не гейтится CI:** сделано — `deploy.yml` переведён на `on: workflow_run` (workflow `CI`, `types: [completed]`, `branches: [main]`) с условием `conclusion == 'success' && event == 'push'`: деплой уезжает только после успешного CI по пушу в `main`, падение CI и PR-прогоны его не триггерят. Плюс `concurrency: deploy-vps` (`cancel-in-progress: false`) — параллельные деплои выстраиваются в очередь и не отменяют начатый. Вариант B (деплой ровно проверенного SHA) не понадобился — git pull на сервере для демо-стенда достаточен.
+- [x] **P2 · Деплой не гейтится CI:** сделано в `67e90c9` — `deploy.yml` переведён на `on: workflow_run` (workflow `CI`, `types: [completed]`, `branches: [main]`) с условием `conclusion == 'success' && event == 'push'`: деплой уезжает только после успешного CI по пушу в `main`, падение CI и PR-прогоны его не триггерят. Плюс `concurrency: deploy-vps` (`cancel-in-progress: false`) — параллельные деплои выстраиваются в очередь и не отменяют начатый. Вариант B (деплой ровно проверенного SHA) не понадобился — git pull на сервере для демо-стенда достаточен.
 - [ ] **P2 · Защитить `main`:** обязательный чек CI и запрет force-push. Делается в Settings → Branches (или Rulesets) либо через `gh api`, нужен доступ к GitHub.
 - [ ] **P3 · Поставить `gh`:** статус прогонов сейчас проверяется запросами к API GitHub, из терминала было бы короче (`gh run watch`).
 
@@ -55,5 +55,6 @@
 - `6d59c03` — payments: `print()` в `yookassa_webhook` заменён на логгер.
 - `1de30de` — `.env.example`: убрано упоминание BeautyCity, исправлена опечатка домена `selftorage` → `selfstorage` (`.env.example`, `settings.py`, `docs/utm.md`).
 - `7690dec` — из репозитория удалены два сгенерированных отчёта `docs/architecture-review-*.html`.
+- `67e90c9` — `deploy.yml`: деплой переведён на `workflow_run` после успешного CI + `concurrency`, параллельные запуски не накладываются.
 - `05aba7f` — **скриншоты для README**: `warehouses.png` обновлён со стенда, добавлен `owner_dashboard.png` (дашборд владельца со входом через CDP), README дополнен, задача в разделе «Витрина» закрыта.
 - Закрыто ранее: `seed_demo` на стенде — осознанное поведение витрины, описано в `docs/deployment.md`.
