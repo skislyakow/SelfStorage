@@ -19,7 +19,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         today = timezone.now().date()
 
-        # Напоминания за 30, 14, 7 и 3 дня до окончания аренды
         for days in [30, 14, 7, 3]:
             for order in RentalOrder.objects.filter(
                 status="active", end_date=today + timedelta(days=days)
@@ -44,7 +43,6 @@ class Command(BaseCommand):
                         "Не удалось отправить напоминание для заказа %s", order.pk
                     )
 
-        # Просроченные: переводим в overdue и напоминаем раз в месяц, начиная с 1-го дня
         for order in RentalOrder.objects.filter(
             status__in=["active", "overdue"], end_date__lt=today
         ):

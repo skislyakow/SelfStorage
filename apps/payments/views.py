@@ -82,7 +82,6 @@ def create_payment(request, order_id):
         payment.amount = order.amount
     payment.save()
 
-    # У yookassa нет py.typed: pyright выводит confirmation как None.
     return redirect(yoo_payment.confirmation.confirmation_url)  # type: ignore
 
 

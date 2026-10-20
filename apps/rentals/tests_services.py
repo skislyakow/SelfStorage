@@ -98,7 +98,6 @@ class CalculateAmountTests(TestCase):
             valid_to=date(2026, 2, 28),
         )
         calc = calculate_amount(self.box, 3, date(2026, 1, 1), promo)
-        # Январь и март по полной, февраль со скидкой 10% → 900.
         self.assertEqual(calc["total"], Decimal("2900.00"))
         self.assertEqual(calc["discounted_months"], 1)
         self.assertEqual(calc["full_months"], 2)

@@ -15,7 +15,6 @@ from apps.rentals.services import generate_qr
 from apps.users.models import User
 from apps.warehouses.models import Box, Review, Warehouse
 
-# Склады — точно по вёрстке boxes.html (город, адрес, t, потолок, база цены, картинка)
 WAREHOUSES = [
     ("Москва", "ул. Рокотова, д. 15", "17 °С", 3.5, 3034, "image11.png"),
     ("Одинцово", "ул. Северная, д. 36", "18 °С", 3.5, 2264, "image9.png"),
@@ -34,7 +33,6 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        # Идемпотентная очистка (каскад удаляет Box/Order/Payment/Delivery/Review)
         Warehouse.objects.all().delete()
         Review.objects.all().delete()
         PromoCode.objects.all().delete()
@@ -66,7 +64,6 @@ class Command(BaseCommand):
             )
             warehouses[city] = wh
 
-            # Гибрид: ~12 боксов со случайно-детерминированными параметрами
             for j in range(1, 13):
                 area = BOX_AREAS[(i + j) % len(BOX_AREAS)]
                 width = round(area**0.5, 1)
@@ -91,7 +88,6 @@ class Command(BaseCommand):
                     status=status,
                 )
 
-        # Фиксированные боксы под личный кабинет (my-rent.html)
         odintsovo = warehouses["Одинцово"]
         lyubertsi = warehouses["Люберцы"]
         box_ekat1, _ = Box.objects.get_or_create(
@@ -121,7 +117,6 @@ class Command(BaseCommand):
             ),
         )
 
-        # Пользователи: Екатерина (как в макете) + суперюзер для админки
         user = User.objects.create_user(
             email="ekatyusha89@yandex.ru",
             first_name="Екатерина",
@@ -148,7 +143,6 @@ class Command(BaseCommand):
             valid_to=date(2026, 3, 31),
         )
 
-        # Две активные аренды Екатерины
         order1 = RentalOrder.objects.create(
             user=user,
             box=box_ekat1,
@@ -187,7 +181,6 @@ class Command(BaseCommand):
         generate_qr(order1)
         generate_qr(order2)
 
-        # Уведомления в кабинете — колокольчик в шапке (2 непрочитанных, 1 прочитанное)
         Notification.objects.create(
             user=user,
             text=(
@@ -218,7 +211,6 @@ class Command(BaseCommand):
             status="done",
         )
 
-        # Просроченный заказ — для обзвона владельцем
         overdue_box = Box.objects.filter(warehouse=warehouses["Москва"]).first()
         assert overdue_box is not None
         RentalOrder.objects.create(
@@ -232,7 +224,6 @@ class Command(BaseCommand):
             traffic_source="direct",
         )
 
-        # Продлён на 6 мес (по техническому заданию — тоже требует звонка)
         ext_box = Box.objects.filter(warehouse=warehouses["Пушкино"]).first()
         assert ext_box is not None
         RentalOrder.objects.create(
@@ -246,7 +237,6 @@ class Command(BaseCommand):
             traffic_source="vk",
         )
 
-        # Новая заявка на доставку — очередь к выполнению
         new_box = (
             Box.objects.filter(warehouse=odintsovo).exclude(pk=box_ekat1.pk).first()
         )
@@ -267,7 +257,6 @@ class Command(BaseCommand):
             status="new",
         )
 
-        # Демо-клиенты для множества заявок на доставку (разные люди)
         CLIENTS = [
             ("ira@mail.ru", "Ира", "+7-909-111-22-33"),
             ("petr@mail.ru", "Пётр", "+7-916-222-33-44"),
@@ -297,8 +286,6 @@ class Command(BaseCommand):
             for email, name, phone in CLIENTS
         }
 
-        # Заявки на доставку с разными статусами, адресами и клиентами;
-        # отклонённые — с причиной (сценарий ТЗ: «не поместится» / «не прошли условия»)
         DELIVERY_DEMO = [
             ("new", "Москва, ул. Тверская, д. 20", ""),
             ("in_progress", "Москва, ул. Ленина, д. 5, кв. 12", ""),
@@ -373,8 +360,6 @@ class Command(BaseCommand):
                 rejection_reason=reason,
             )
 
-        # Отзывы для карусели на главной (как в макете): два опубликованных
-        # и один на модерации — чтобы в админке было видно сценарий публикации.
         media_rev = settings.MEDIA_ROOT / "reviews"
         os.makedirs(media_rev, exist_ok=True)
 

@@ -36,8 +36,6 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
         if step == "0":
             box_id = self.request.GET.get("box")
             if box_id:
-                # formtools без py.typed: pyright типизирует get_form(...) как
-                # formset, а form.fields["box"] — как Field без queryset.
                 form.fields["box"].queryset = Box.objects.filter(  # type: ignore
                     pk=box_id, status="free"
                 )

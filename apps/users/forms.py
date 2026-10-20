@@ -70,8 +70,6 @@ class CustomSetPasswordForm(SetPasswordForm):
 class CustomUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
         model = User
-        # Стабы UserChangeForm.Meta объявляют fields как str ("__all__"):
-        # несовместимость только в типах, Django принимает и строку, и кортеж.
         fields = (  # type: ignore
             "first_name",
             "email",

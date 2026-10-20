@@ -37,25 +37,23 @@ indent-width = 4
 
 [tool.ruff.lint]
 select = [
-  "E",  # pycodestyle
-  "F",  # pyflakes
-  "I",  # isort
-  "UP", # pyupgrade
-  "B",  # flake8-bugbear
-  "RUF",# ruff-specific
+  "E",
+  "F",
+  "I",
+  "UP",
+  "B",
+  "RUF",
 ]
 ignore = [
-  # Тексты проекта русскоязычные: все кириллические буквы «похожи» на латинские,
-  # это не опечатка, а нормальный текст.
-  "RUF001", # строка
-  "RUF002", # докстринг
-  "RUF003", # комментарий
+  "RUF001",
+  "RUF002",
+  "RUF003",
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "**/migrations/*.py" = [
-  "E501",   # длинные help_text/choices из автогенерированных миграций
-  "RUF012", # dependencies/choices объявлены списками
+  "E501",
+  "RUF012",
 ]
 
 [tool.ruff.format]

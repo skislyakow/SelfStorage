@@ -93,5 +93,4 @@ def send_notifications_now(request, *args, **kwargs):
     return redirect("owner-dashboard")
 
 
-# Сделать «Панель владельца» главной страницей админки (вход по /admin/)
 admin.site.index = owner_dashboard  # type: ignore[method-assign]

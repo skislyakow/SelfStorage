@@ -193,7 +193,6 @@ class InAppNotificationTests(TestCase):
     def test_list_requires_login(self):
         response = self.client.get(reverse("notifications:list"))
         self.assertEqual(response.status_code, 302)
-        # url у редиректа в стабах клиента не типизирован, см. Location.
         self.assertIn("login", response.headers["Location"])
 
     def test_list_shows_only_own_notifications(self):
