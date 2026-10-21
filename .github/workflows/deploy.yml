@@ -1,22 +1,17 @@
 name: Deploy to VPS
 
-# Деплой только после успешного CI: на push в main он не запускается сам,
-# а ждёт завершения workflow CI с conclusion == success.
 on:
   workflow_run:
     workflows: [CI]
     types: [completed]
     branches: [main]
 
-# Параллельные деплои не накладываются: новый ждёт предыдущий,
-# но и не отменяет уже начатый (cancel-in-progress: false).
 concurrency:
   group: deploy-vps
   cancel-in-progress: false
 
 jobs:
   deploy:
-    # Штатный прогон CI после push в main; падение CI или PR-прогон — не деплоим.
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push'
@@ -32,7 +27,5 @@ jobs:
           script_stop: true
           script: |
             cd /opt/selftorage
-            # Только fast-forward: сервер не хранит своих коммитов, а после
-            # переписанной истории обычный pull падает на слиянии веток.
             git pull --ff-only
             bash /opt/selftorage/deploy.sh

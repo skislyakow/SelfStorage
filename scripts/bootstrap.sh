@@ -1,10 +1,4 @@
 #!/usr/bin/env sh
-# Set up the local environment: Python dependencies, git hooks + local agent skills.
-# .agents/ is not tracked in git (see .gitignore): skills are installed from
-# skills-lock.json so every machine gets the same versions.
-#
-#   ./scripts/bootstrap.sh          # uv sync + pre-commit install + restore skills if missing
-#   ./scripts/bootstrap.sh --update # uv sync + pre-commit install + update skills to latest
 set -eu
 
 update=0
@@ -29,8 +23,6 @@ fi
 
 if [ "$update" = 1 ]; then
     echo "==> skills update"
-    # The CLI can crash on exit on Windows after doing its job, so a non-zero
-    # exit code is not treated as a failure here.
     npx -y skills@latest update -p -y || true
     echo "note: skills-lock.json may have changed - check git diff and commit"
     exit 0

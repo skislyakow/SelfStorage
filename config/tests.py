@@ -10,7 +10,6 @@ class PrivacyPageTests(TestCase):
         response = self.client.get("/privacy/")
         content = response.content.decode()
         self.assertIn("Политика конфиденциальности", content)
-        # Подвал ссылается на #legal («Правевые документы») — секция должна быть.
         self.assertIn("Правовые документы", content)
 
     def test_registration_form_links_to_privacy_policy(self):

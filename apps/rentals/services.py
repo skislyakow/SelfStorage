@@ -36,8 +36,6 @@ def generate_qr(order):
 
     img = qr.make_image(fill_color="black", back_color="white")
     buffer = BytesIO()
-    # qrcode без py.typed: BaseImage.save объявлен как save(stream, kind=None),
-    # а у PIL-реализации есть аргумент format — ложное срабатывание pyright.
     img.save(buffer, format="PNG")  # type: ignore
 
     filename = f"qr_{order.pk}.png"

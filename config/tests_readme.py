@@ -44,8 +44,6 @@ class ReadmeVersionBadgesTests(SimpleTestCase):
         self.assertEqual(badge_version("Django"), django_pin())
 
     def test_bootstrap_badge_matches_cdn_in_base_template(self):
-        # CSS и JS Bootstrap в base.html — одной версии, и это та версия,
-        # что в бейдже: набор из findall должен состоять из одного элемента.
         versions = set(re.findall(r"bootstrap@(\d+\.\d+\.\d+)", BASE_TEMPLATE))
         self.assertEqual(versions, {badge_version("Bootstrap")})
 

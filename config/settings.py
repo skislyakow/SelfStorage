@@ -10,22 +10,12 @@ env.read_env(str(BASE_DIR / ".env"))
 
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
-# Примечание к type: ignore ниже: у django-environ нет py.typed, pyright
-# выводит default как NoValue и жалуется на значения по умолчанию.
 ALLOWED_HOSTS = env.list(
     "ALLOWED_HOSTS",
     default=["selfstorage.kislyakov.pro", "localhost", "127.0.0.1"],  # type: ignore
 )
 
-# Прокси nginx терминирует TLS и шлёт X-Forwarded-Proto, gunicorn слушает
-# только 127.0.0.1:8003 — заголовку можно доверять. Без него приложение
-# за прокси считало бы запрос HTTP и не выставляло HSTS.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# HSTS: браузер запоминает «только HTTPS» на max-age (по умолчанию — год).
-# На стенде рабочий сертификат Let's Encrypt, но откатить долго: браузеры
-# держат max-age, поэтому включаем осознанно, kill-switch — 0 в .env.
-# includeSubDomains/preload не включаем: они бы распространились на все
-# *.kislyakov.pro, где HTTPS включён не везде.
 SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=31536000)
 
 INSTALLED_APPS = [
@@ -119,21 +109,15 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")  # type: ignore
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")  # type: ignore
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
-# REG.RU требует, чтобы FROM был авторизованным ящиком (реальным), иначе
-# релей отклоняется с 451. Поэтому по умолчанию — реальный ящик, а не noreply@.
 DEFAULT_FROM_EMAIL = env(
     "DEFAULT_FROM_EMAIL",
     default="selfstorage@kislyakov.pro",  # type: ignore
 )
 
-# YooKassa (Юмани) — приём оплат за аренду боксов
 YOOKASSA_SHOP_ID = env("YOOKASSA_SHOP_ID", default="")  # type: ignore
 YOOKASSA_SECRET_KEY = env("YOOKASSA_SECRET_KEY", default="")  # type: ignore
 SITE_URL = env("SITE_URL", default="https://selfstorage.kislyakov.pro")  # type: ignore
 
-# Куда уходит аноним из login_required/LoginRequiredMixin. Адрес берём из
-# URLconf, а не строкой: со строкой "/login/" редирект вёл на 404, потому что
-# настоящая страница входа живёт на /accounts/login/.
 LOGIN_URL = reverse_lazy("users:login")
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"

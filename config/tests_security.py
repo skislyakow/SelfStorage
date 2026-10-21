@@ -16,8 +16,6 @@ class SecurityHeadersTests(TestCase):
         self.assertIn("Content-Security-Policy", response.headers)
 
     def test_hsts_set_behind_proxy(self):
-        # Так запрос идёт со стенда: nginx терминирует TLS и проксирует
-        # в gunicorn с X-Forwarded-Proto: https.
         response = self.client.get("/", headers={"X-Forwarded-Proto": "https"})
         self.assertEqual(
             response.headers.get("Strict-Transport-Security"), "max-age=31536000"

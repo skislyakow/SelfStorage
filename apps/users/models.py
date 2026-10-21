@@ -29,24 +29,16 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    # Вход по email: поле username убрано, поэтому тип из AbstractUser не подходит.
     username = None  # type: ignore[assignment]
     email = models.EmailField("Email", unique=True)
     phone = models.CharField("Телефон", max_length=20, blank=True, default="")
     pd_consent = models.BooleanField("Согласие на обработку ПД", default=False)
 
-    # Свой менеджер вместо django.contrib.auth.models.UserManager.
-    # Аннотация обязательна: без неё Pylance берёт ClassVar[UserManager[Self]]
-    # из стабов AbstractUser и требует username в create_user().
     objects: ClassVar[UserManager] = UserManager()  # type: ignore[assignment,misc]
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: ClassVar[list[str]] = []
 
     class Meta(AbstractUser.Meta):
-        # Наследуем, как django.contrib.auth.models.User: pyright сравнивает
-        # вложенные Meta номинально, и без наследования ругается на
-        # несовместимость с AbstractUser.Meta. abstract Django сбрасывает
-        # в False при создании AbstractUser — User остаётся конкретным.
         verbose_name: ClassVar[str] = "Пользователь"
         verbose_name_plural: ClassVar[str] = "Пользователи"
 
