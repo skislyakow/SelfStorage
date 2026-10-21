@@ -110,12 +110,6 @@ class MyRentView(LoginRequiredMixin, ListView):
 
 
 class BoxAccessView(DetailView):
-    """QR-доступ: переход по QR открывает бокс (правило — в services.open_box).
-
-    Доступно по ссылке/QR любому, у кого есть QR (семья, охрана). Открытие
-    возможно только при активной аренде (срок не вышел).
-    """
-
     model = RentalOrder
     template_name = "rentals/qr_access.html"
     context_object_name = "order"
@@ -127,7 +121,6 @@ class BoxAccessView(DetailView):
 
 
 def box_close(request, pk):
-    """Закрыть бокс: любой, кому доступен бокс (правило — в services.close_box)."""
     order = get_object_or_404(RentalOrder, pk=pk)
     services.close_box(order)
     if request.user.is_authenticated:

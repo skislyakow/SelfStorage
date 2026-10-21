@@ -21,8 +21,6 @@ CONTENT_SECURITY_POLICY = "; ".join(
 
 
 class ContentSecurityPolicyMiddleware:
-    """Ставит Content-Security-Policy на каждый ответ приложения."""
-
     def __init__(self, get_response: Callable[[HttpRequest], HttpResponseBase]) -> None:
         self.get_response = get_response
 

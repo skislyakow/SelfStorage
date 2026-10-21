@@ -2,8 +2,6 @@ from django.test import TestCase
 
 
 class SecurityHeadersTests(TestCase):
-    """HSTS и CSP — два заголовка, которых не было на стенде (см. TODO)."""
-
     def test_csp_header_on_home_page(self):
         response = self.client.get("/")
         csp = response.headers.get("Content-Security-Policy", "")

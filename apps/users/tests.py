@@ -53,13 +53,6 @@ class RegistrationTests(TestCase):
 
 
 class NextRedirectTests(TestCase):
-    """Возврат в оформление заказа после входа и регистрации.
-
-    Анонимный переход на закрытую страницу уходит на форму входа: со строкой
-    LOGIN_URL = "/login/" он попадал на 404, потому что вход живёт на
-    /accounts/login/.
-    """
-
     def setUp(self):
         self.client = Client(SERVER_NAME="localhost")
 

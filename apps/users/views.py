@@ -10,13 +10,6 @@ from .forms import CustomUserCreationForm
 
 
 def _register_redirect_url(request):
-    """Куда вернуть человека после регистрации.
-
-    Модалка регистрации и страница входа передают `next` из сценария
-    оформления заказа (в POST — скрытым полем, на странице — в query-строке).
-    Без этого регистрация выбрасывала человека на главную, теряя выбранный
-    бокс, тогда как вход вёл обратно в оформление.
-    """
     next_url = request.POST.get("next") or request.GET.get("next")
     if next_url and url_has_allowed_host_and_scheme(
         next_url,

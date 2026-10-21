@@ -8,8 +8,6 @@ from apps.notifications.models import Notification
 
 
 class NotificationListView(LoginRequiredMixin, ListView):
-    """Список уведомлений пользователя (только свои)."""
-
     template_name = "notifications/list.html"
     context_object_name = "notifications"
 
@@ -20,6 +18,5 @@ class NotificationListView(LoginRequiredMixin, ListView):
 @login_required
 @require_POST
 def mark_all_read(request):
-    """Отметить все уведомления пользователя прочитанными."""
     Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
     return redirect("notifications:list")

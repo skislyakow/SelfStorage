@@ -29,7 +29,6 @@ def _configure_yookassa():
 
 @login_required
 def create_payment(request, order_id):
-    """Создать платёж в Юмани и перенаправить пользователя на оплату."""
     order = get_object_or_404(RentalOrder, pk=order_id)
     if order.user != request.user:
         return redirect("warehouse_list")
@@ -87,7 +86,6 @@ def create_payment(request, order_id):
 
 @login_required
 def payment_success(request, order_id):
-    """Возврат из Юмани — проверяем статус и завершаем заказ."""
     order = get_object_or_404(RentalOrder, pk=order_id)
     if order.user != request.user:
         return redirect("warehouse_list")
@@ -107,7 +105,6 @@ def payment_success(request, order_id):
 
 
 def _mark_paid(payment, order):
-    """Отметить платёж и заказ оплаченными, занять бокс, уведомить клиента."""
     if payment.status != "succeeded":
         payment.status = "succeeded"
         payment.save()
@@ -143,7 +140,6 @@ def _mark_paid(payment, order):
 
 @csrf_exempt
 def yookassa_webhook(request):
-    """Уведомление от Юмани о смене статуса платежа."""
     if request.method == "POST":
         try:
             data = json.loads(request.body)

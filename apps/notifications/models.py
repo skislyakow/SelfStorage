@@ -3,12 +3,6 @@ from django.db import models
 
 
 class Notification(models.Model):
-    """Уведомление в личном кабинете (колокольчик в шапке).
-
-    Дублирует важные письма: письмо можно пропустить, а уведомление
-    остаётся в кабинете, пока пользователь его не прочитает.
-    """
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

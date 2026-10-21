@@ -4,6 +4,7 @@
 - apps/ - Django apps (users, warehouses, rentals, promotions, payments, notifications)
 - config/ - settings, urls, wsgi/asgi, templates
 - docs/ - project docs (deploy, utm, qr, notifications, arch review, TODO)
+- docs/agent-skills.md - скиллы агентов (.agents/skills, skills-lock.json, установка и обновление)
 - docs/TODO.md - открытые задачи проекта: продолжать работу отсюда, дописывать туда же
 - .agents/skills/ - скиллы mattpocock для opencode; каталог локальный, НЕ в git (см. .gitignore), восстанавливается из skills-lock.json
 - skills-lock.json - манифест скиллов (источник + хеши), лежит в git
