@@ -17,8 +17,6 @@ from apps.warehouses.models import Box, Warehouse
 
 
 class BoxAccessServiceTests(TestCase):
-    """Правила доступа к боксу живут в services и не зависят от HTTP."""
-
     def setUp(self):
         self.user = User.objects.create_user(
             email="renter@test.ru", password="pass1234"
@@ -68,8 +66,6 @@ class BoxAccessServiceTests(TestCase):
 
 
 class CalculateAmountTests(TestCase):
-    """Расчёт суммы заказа — чистая бизнес-функция, покрыта напрямую."""
-
     def setUp(self):
         self.wh = Warehouse.objects.create(city="Москва", address="ул. Тест, 1")
         self.box = Box.objects.create(

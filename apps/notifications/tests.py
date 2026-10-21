@@ -147,8 +147,6 @@ class SendNotificationsTests(TestCase):
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class InAppNotificationTests(TestCase):
-    """Уведомления в кабинете: колокольчик, список, отметка о прочтении."""
-
     def setUp(self):
         self.user = User.objects.create_user(
             email="bell@example.com", password="pass12345"

@@ -1,10 +1,3 @@
-"""Бейджи и таблица стека в README не должны врать о версиях.
-
-Python, Django и Bootstrap сверяются с источниками правды в репозитории —
-при бампе версии CI падает, пока README не обновят. У nginx версии в репо
-нет (живёт на VPS), его бейдж обновляется вручную — см. AGENTS.md.
-"""
-
 import re
 import tomllib
 from pathlib import Path
@@ -19,14 +12,12 @@ BASE_TEMPLATE = (BASE_DIR / "config" / "templates" / "base.html").read_text(
 
 
 def badge_version(name: str) -> str:
-    """Версия из shields-url вида ``.../badge/Django-5.2.17-092E20...``."""
     match = re.search(rf"badge/{name}-([0-9][0-9.]*)-", README)
     assert match is not None, f"бейдж {name} не найден в README"
     return match.group(1)
 
 
 def django_pin() -> str:
-    """Пин django из pyproject, напр. ``5.2.17``."""
     pyproject = tomllib.loads((BASE_DIR / "pyproject.toml").read_text("utf-8"))
     deps: list[str] = pyproject["project"]["dependencies"]
     for dep in deps:

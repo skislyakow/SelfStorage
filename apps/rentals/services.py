@@ -17,13 +17,11 @@ from apps.warehouses.models import Box
 
 
 def qr_payload(order):
-    """Данные, которые кодирует QR: ссылка на страницу доступа к боксу."""
     url = settings.SITE_URL.rstrip("/") + reverse("qr_access", args=[order.pk])
     return url
 
 
 def generate_qr(order):
-    """Сгенерировать QR-код доступа, сохранить файл в media/qr/ и вернуть FieldFile."""
     data = qr_payload(order)
     qr = qrcode.QRCode(
         version=1,
@@ -50,7 +48,6 @@ def generate_qr(order):
 
 
 def add_months(start, months):
-    """Дата начала плюс N месяцев с учётом разной длины месяцев."""
     total = start.month - 1 + months
     year = start.year + total // 12
     month = total % 12 + 1
@@ -58,8 +55,6 @@ def add_months(start, months):
 
 
 def calculate_amount(box: Box, rental_months, start_date, promo: PromoCode | None):
-    """Сумма заказа: по месяцам раскладывает скидку промокода по периодам её
-    действия (месяц со скидкой, если он пересекается с окном промо)."""
     full_price = box.price_per_month
     if promo is None:
         return {
@@ -95,12 +90,10 @@ def calculate_amount(box: Box, rental_months, start_date, promo: PromoCode | Non
 
 
 def can_open_box(order: RentalOrder) -> bool:
-    """Правило доступа: бокс открывается только при активной аренде."""
     return order.status == "active"
 
 
 def open_box(order: RentalOrder) -> bool:
-    """Открыть бокс по QR. True — если статус изменился (открыл сейчас)."""
     if not can_open_box(order) or order.access_status == "open":
         return False
     order.access_status = "open"
@@ -109,6 +102,5 @@ def open_box(order: RentalOrder) -> bool:
 
 
 def close_box(order: RentalOrder) -> None:
-    """Закрыть бокс: вправе любой, кому выдан QR-доступ."""
     order.access_status = "closed"
     order.save(update_fields=["access_status"])
