@@ -44,6 +44,15 @@ class DeliveryForm(forms.Form):
         widget=forms.TextInput(attrs={"class": INPUT_CLASS}),
     )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        assert cleaned_data is not None
+        delivery_type = cleaned_data.get("delivery_type")
+        address = (cleaned_data.get("address") or "").strip()
+        if delivery_type in ("delivery", "measure") and not address:
+            self.add_error("address", "Укажите адрес доставки")
+        return cleaned_data
+
 
 class ContactsForm(forms.Form):
     first_name = forms.CharField(

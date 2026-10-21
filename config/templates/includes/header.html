@@ -33,7 +33,7 @@
 							<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill SelfStorage__bg_orange">{{ unread_notifications }}</span>
 							{% endif %}
 						</a>
-						<ul class="dropdown-menu dropdown-menu-end shadow" style="max-width: 320px;" aria-labelledby="notificationsBell">
+						<ul class="dropdown-menu dropdown-menu-end shadow" style="width: 420px; max-width: 90vw;" aria-labelledby="notificationsBell">
 							{% for note in recent_notifications %}
 							<li>
 								<a class="dropdown-item text-wrap {% if not note.is_read %}fw-bold{% endif %}" href="{% if note.url %}{{ note.url }}{% else %}{% url 'notifications:list' %}{% endif %}">{{ note.text }}</a>
