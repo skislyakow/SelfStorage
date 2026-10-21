@@ -80,6 +80,47 @@ class OrderWizardTests(TestCase):
         self.assertEqual(RentalOrder.objects.count(), 1)
         self.assertEqual(DeliveryRequest.objects.count(), 0)
 
+    def test_wizard_delivery_without_address_stays_on_step(self):
+        self.client.login(email="wizard@test.ru", password="pass1234")
+        r = self.client.get(reverse("order_wizard"))
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "1"}, r)
+        r = self._post_step({"1-delivery_type": "delivery"}, r)
+
+        self.assertEqual(
+            self._management(r.content.decode())["order_wizard-current_step"],
+            "1",
+        )
+        self.assertContains(r, "Укажите адрес доставки")
+        self.assertEqual(RentalOrder.objects.count(), 0)
+
+    def test_wizard_measure_without_address_stays_on_step(self):
+        self.client.login(email="wizard@test.ru", password="pass1234")
+        r = self.client.get(reverse("order_wizard"))
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "1"}, r)
+        r = self._post_step({"1-delivery_type": "measure"}, r)
+
+        self.assertEqual(
+            self._management(r.content.decode())["order_wizard-current_step"],
+            "1",
+        )
+        self.assertContains(r, "Укажите адрес доставки")
+        self.assertEqual(RentalOrder.objects.count(), 0)
+
+    def test_wizard_measure_with_address_passes(self):
+        self.client.login(email="wizard@test.ru", password="pass1234")
+        r = self.client.get(reverse("order_wizard"))
+        r = self._post_step({"0-box": str(self.box.pk), "0-rental_months": "1"}, r)
+        r = self._post_step(
+            {"1-delivery_type": "measure", "1-address": "ул. Замерная, 5"}, r
+        )
+        r = self._post_step(
+            {"2-first_name": "Имя", "2-phone": "79990000000"},
+            r,
+        )
+
+        self.assertEqual(RentalOrder.objects.count(), 1)
+        self.assertEqual(DeliveryRequest.objects.count(), 1)
+
     def test_wizard_prefills_box_from_query(self):
         self.client.login(email="wizard@test.ru", password="pass1234")
         r = self.client.get(reverse("order_wizard") + f"?box={self.box.pk}")
