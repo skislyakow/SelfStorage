@@ -4,6 +4,11 @@
 {% block title %}SelfStorage{% endblock %}
 
 {% block content %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} py-3 fs_24 mt-4 mb-0" role="alert">{{ message }}</div>
+{% endfor %}
+{% endif %}
 <article class="row">
 	<div class="col-12 col-lg-6 mb-3 mb-lg-0">
 		<h1 class="fw-bold SelfStorage_green mb-5">Доставка и бережное хранение ваших вещей</h1>
@@ -143,9 +148,9 @@
 	</div>
 </article>
 
-{% if reviews %}
 <article class="row pt-header">
 	<h1 class="text-center fw-bold SelfStorage_green mb-4">Забота о ваших ценностях – наша главная задача</h1>
+	{% if reviews %}
 	<div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
 		<div class="carousel-inner border">
 			{% for review in reviews %}
@@ -204,8 +209,11 @@
 		</div>
 	</aside>
 	{% endfor %}
+	{% endif %}
+	<div class="d-flex justify-content-center mt-5">
+		<a href="{% url 'review_create' %}" class="btn border-8 py-3 px-5 text-white fs_24 SelfStorage__bg_green SelfStorage__btn2_green text-decoration-none">Оставить отзыв</a>
+	</div>
 </article>
-{% endif %}
 {% endblock %}
 
 {% block footer_promo %}
