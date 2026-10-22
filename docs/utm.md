@@ -14,7 +14,7 @@ Middleware `apps/rentals/middleware.py` сохраняет в сессии па�
 |---|---|
 | ВКонтакте | `https://selfstorage.kislyakov.pro/?utm_source=vk` |
 | Google Ads | `https://selfstorage.kislyakov.pro/?utm_source=google` |
-| Яндекс.Директ (на бокс) | `https://selfstorage.kislyakov.pro/rentals/wizard/?box=1&utm_source=yandex` |
+| Яндекс.Директ (на бокс) | `https://selfstorage.kislyakov.pro/orders/wizard/?box=1&utm_source=yandex` |
 | Facebook | `https://selfstorage.kislyakov.pro/?utm_source=facebook&utm_campaign=vesna` |
 | Instagram (алиас src) | `https://selfstorage.kislyakov.pro/?src=instagram` |
 | VK с кампанией | `https://selfstorage.kislyakov.pro/?utm_source=vk&utm_campaign=vesna` |
