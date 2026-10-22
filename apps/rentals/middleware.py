@@ -10,4 +10,7 @@ class TrafficSourceMiddleware(MiddlewareMixin):
             if value:
                 request.session["traffic_source"] = value
                 break
+        campaign = request.GET.get("utm_campaign")
+        if campaign:
+            request.session["traffic_campaign"] = campaign
         return None

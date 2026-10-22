@@ -80,6 +80,15 @@ class OwnerDashboardTests(TestCase):
         self.assertContains(resp, "google")
         self.assertContains(resp, "direct")
 
+    def test_dashboard_breaks_down_by_campaign(self):
+        admin = User.objects.get(email="admin@selfstorage.ru")
+        self.client.force_login(admin)
+        resp = self.client.get("/admin/owner-dashboard/")
+        self.assertContains(resp, "Кампания")
+        self.assertContains(resp, "vesna")
+        self.assertContains(resp, "lyto")
+        self.assertContains(resp, "(без кампании)")
+
     def test_delivery_add_requires_order(self):
         admin = User.objects.get(email="admin@selfstorage.ru")
         self.client.force_login(admin)

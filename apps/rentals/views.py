@@ -66,6 +66,7 @@ class OrderWizard(LoginRequiredMixin, SessionWizardView):
             promo=promo,
             amount=calc["total"],
             traffic_source=self.request.session.get("traffic_source", ""),
+            traffic_campaign=self.request.session.get("traffic_campaign", ""),
         )
         box.status = "reserved"
         box.save()
