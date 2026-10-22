@@ -24,6 +24,12 @@ class OwnerDashboardTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, "Панель владельца")
 
+    def test_dashboard_loads_admin_theme_css(self):
+        admin = User.objects.get(email="admin@selfstorage.ru")
+        self.client.force_login(admin)
+        resp = self.client.get("/admin/")
+        self.assertContains(resp, "css/admin.css")
+
     def test_dashboard_renders_for_staff(self):
         admin = User.objects.get(email="admin@selfstorage.ru")
         self.client.force_login(admin)
