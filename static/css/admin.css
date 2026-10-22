@@ -1,0 +1,200 @@
+/* Палитра SelfStorage поверх переменных Django admin.
+   Порядок каскада: base.css -> dark_mode.css -> этот файл (block extrastyle),
+   поэтому равная спецификация перекрывает дефолт обеих тем. */
+
+html[data-theme="light"],
+:root {
+    --primary: #579586;
+    --primary-fg: #fff;
+    --secondary: #4a7d70;
+    --accent: #F28A4F;
+
+    --body-fg: #353940;
+    --body-bg: #fff;
+    --body-quiet-color: #89939E;
+    --body-medium-color: #5c636b;
+    --body-loud-color: #212529;
+
+    --header-color: #579586;
+    --header-branding-color: #fff;
+    --header-bg: #fff;
+    --header-link-color: #579586;
+
+    --breadcrumbs-fg: #cfe3dd;
+    --breadcrumbs-link-fg: #fff;
+    --breadcrumbs-bg: #579586;
+
+    --link-fg: #579586;
+    --link-hover-color: #F28A4F;
+    --link-selected-fg: #4a7d70;
+
+    --hairline-color: #e3e9e7;
+    --border-color: #ccd8d4;
+
+    --error-fg: #ba2121;
+
+    --message-success-bg: #eaf3f0;
+    --message-warning-bg: #fdf0e3;
+    --message-error-bg: #fbeaea;
+
+    --darkened-bg: #f7f9f8;
+    --selected-bg: #eaf3f0;
+    --selected-row: #eaf3f0;
+
+    --button-fg: #fff;
+    --button-bg: #4a7d70;
+    --button-hover-bg: #3e6a5f;
+    --default-button-bg: #579586;
+    --default-button-hover-bg: #4a7d70;
+    --close-button-bg: #89939E;
+    --close-button-hover-bg: #353940;
+    --delete-button-bg: #F28A4F;
+    --delete-button-hover-bg: #d9743c;
+
+    --object-tools-fg: var(--button-fg);
+    --object-tools-bg: var(--close-button-bg);
+    --object-tools-hover-bg: var(--close-button-hover-bg);
+
+    --font-family-primary: "Commissioner", "Segoe UI", system-ui, Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary: #6fb3a2;
+        --primary-fg: #fff;
+        --secondary: #3e6a5f;
+        --accent: #F28A4F;
+
+        --body-fg: #e9ecea;
+        --body-bg: #121212;
+        --body-quiet-color: #89939E;
+        --body-medium-color: #b5bcba;
+        --body-loud-color: #ffffff;
+
+        --header-color: #6fb3a2;
+        --header-branding-color: #1a1f1d;
+        --header-bg: #1a1f1d;
+        --header-link-color: #6fb3a2;
+
+        --breadcrumbs-fg: #a7ccc3;
+        --breadcrumbs-link-fg: #fff;
+        --breadcrumbs-bg: #2c4a41;
+
+        --link-fg: #7fc4b4;
+        --link-hover-color: #F28A4F;
+        --link-selected-fg: #6fb3a2;
+
+        --hairline-color: #272c2a;
+        --border-color: #39423f;
+
+        --error-fg: #e35f5f;
+
+        --message-success-bg: #14312a;
+        --message-warning-bg: #3a2a15;
+        --message-error-bg: #3a1a1a;
+
+        --darkened-bg: #1c211f;
+        --selected-bg: #24312c;
+        --selected-row: #1f332d;
+
+        --button-fg: #fff;
+        --button-bg: #3e6a5f;
+        --button-hover-bg: #4a7d70;
+        --default-button-bg: #579586;
+        --default-button-hover-bg: #6fb3a2;
+        --delete-button-bg: #d9743c;
+        --delete-button-hover-bg: #F28A4F;
+    }
+}
+
+html[data-theme="dark"] {
+    --primary: #6fb3a2;
+    --primary-fg: #fff;
+    --secondary: #3e6a5f;
+    --accent: #F28A4F;
+
+    --body-fg: #e9ecea;
+    --body-bg: #121212;
+    --body-quiet-color: #89939E;
+    --body-medium-color: #b5bcba;
+    --body-loud-color: #ffffff;
+
+    --header-color: #6fb3a2;
+    --header-branding-color: #1a1f1d;
+    --header-bg: #1a1f1d;
+    --header-link-color: #6fb3a2;
+
+    --breadcrumbs-fg: #a7ccc3;
+    --breadcrumbs-link-fg: #fff;
+    --breadcrumbs-bg: #2c4a41;
+
+    --link-fg: #7fc4b4;
+    --link-hover-color: #F28A4F;
+    --link-selected-fg: #6fb3a2;
+
+    --hairline-color: #272c2a;
+    --border-color: #39423f;
+
+    --error-fg: #e35f5f;
+
+    --message-success-bg: #14312a;
+    --message-warning-bg: #3a2a15;
+    --message-error-bg: #3a1a1a;
+
+    --darkened-bg: #1c211f;
+    --selected-bg: #24312c;
+    --selected-row: #1f332d;
+
+    --button-fg: #fff;
+    --button-bg: #3e6a5f;
+    --button-hover-bg: #4a7d70;
+    --default-button-bg: #579586;
+    --default-button-hover-bg: #6fb3a2;
+    --delete-button-bg: #d9743c;
+    --delete-button-hover-bg: #F28A4F;
+}
+
+#site-name a {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.admin-logo {
+    height: 26px;
+    width: auto;
+}
+
+#header {
+    border-bottom: 1px solid var(--hairline-color);
+}
+
+.button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+button {
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+textarea,
+select {
+    border-radius: 6px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--primary);
+}
