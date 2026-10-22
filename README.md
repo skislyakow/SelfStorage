@@ -4,7 +4,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/Django-5.2.17-092E20?logo=django&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-3.49.1-003B57?logo=sqlite&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.0.2-7952B3?logo=bootstrap&logoColor=white)
 ![uv](https://img.shields.io/badge/deps-uv-DE5FE9?logo=uv&logoColor=white)
 ![nginx](https://img.shields.io/badge/nginx-1.24-009639?logo=nginx&logoColor=white)
@@ -54,15 +54,15 @@
 
 ## Скриншоты
 
-![Главная страница](docs/img/home.png)
+![Главная страница](docs/img/home.webp)
 
-![Склады и боксы](docs/img/warehouses.png)
+![Склады и боксы](docs/img/warehouses.webp)
 
-![Правила хранения](docs/img/storage_rules.png)
+![Правила хранения](docs/img/storage_rules.webp)
 
-![Вход](docs/img/login.png)
+![Вход](docs/img/login.webp)
 
-![Панель владельца — дашборд заказов, выручки и заявок на доставку](docs/img/owner_dashboard.png)
+![Панель владельца — дашборд заказов, выручки и заявок на доставку](docs/img/owner_dashboard.webp)
 
 ## Как запустить
 
