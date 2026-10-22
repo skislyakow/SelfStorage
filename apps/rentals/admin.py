@@ -103,9 +103,10 @@ class RentalOrderAdmin(admin.ModelAdmin):
         "end_date",
         "days_overdue",
         "traffic_source",
+        "traffic_campaign",
         "last_overdue_notified",
     )
-    list_filter = ("status", "traffic_source", OverdueCallFilter)
+    list_filter = ("status", "traffic_source", "traffic_campaign", OverdueCallFilter)
     search_fields = ("user__email", "user__phone", "box__number")
     list_select_related = ("user", "box__warehouse")
 

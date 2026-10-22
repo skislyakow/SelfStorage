@@ -153,6 +153,7 @@ class Command(BaseCommand):
             promo=promo_storage15,
             amount=box_ekat1.price_per_month * Decimal("0.85"),
             traffic_source="vk",
+            traffic_campaign="vesna",
         )
         order2 = RentalOrder.objects.create(
             user=user,
@@ -235,6 +236,7 @@ class Command(BaseCommand):
             status="extended_6m",
             amount=ext_box.price_per_month * Decimal("1.5"),
             traffic_source="vk",
+            traffic_campaign="vesna",
         )
 
         new_box = (
@@ -249,6 +251,7 @@ class Command(BaseCommand):
             status="awaiting_payment",
             amount=2500,
             traffic_source="google",
+            traffic_campaign="lyto",
         )
         DeliveryRequest.objects.create(
             order=new_order,

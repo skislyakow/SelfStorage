@@ -105,7 +105,7 @@ def owner_dashboard(request, *args, **kwargs):
     ]
 
     raw_sources = (
-        RentalOrder.objects.values("traffic_source")
+        RentalOrder.objects.values("traffic_source", "traffic_campaign")
         .annotate(
             orders=Count("id"),
             clients=Count("user", distinct=True),
@@ -116,11 +116,13 @@ def owner_dashboard(request, *args, **kwargs):
     traffic_sources = []
     traffic_total = {"orders": 0, "clients": 0, "revenue": 0}
     for row in raw_sources:
-        label = row["traffic_source"] or "(без метки)"
+        source = row["traffic_source"] or "(без метки)"
+        campaign = row["traffic_campaign"] or "(без кампании)"
         revenue = row["revenue"] or 0
         traffic_sources.append(
             {
-                "source": label,
+                "source": source,
+                "campaign": campaign,
                 "orders": row["orders"],
                 "clients": row["clients"],
                 "revenue": revenue,
