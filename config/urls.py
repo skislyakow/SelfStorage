@@ -5,13 +5,14 @@ from django.urls import include, path
 
 from apps.warehouses.views import review_create
 from config import views
-from config.admin_dashboard import owner_dashboard, send_notifications_now
+from config.admin_dashboard import owner_dashboard, send_notifications_now, utm_builder
 
 urlpatterns = [
     path("admin/owner-dashboard/", owner_dashboard, name="owner-dashboard"),
     path(
         "admin/send-notifications/", send_notifications_now, name="send-notifications"
     ),
+    path("admin/utm-builder/", utm_builder, name="utm-builder"),
     path("admin/", admin.site.urls),
     path("", views.HomeView.as_view(), name="home"),
     path("reviews/create/", review_create, name="review_create"),

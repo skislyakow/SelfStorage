@@ -1,0 +1,68 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .utm-panel { padding: 1rem 2rem 2rem; max-width: 760px; }
+  .utm-panel h1 { margin-bottom: .25rem; }
+  .utm-panel .muted { color: var(--body-quiet-color); }
+  .utm-form { margin: 1.25rem 0 1.5rem; }
+  .utm-form .form-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: .75rem; }
+  .utm-form .form-row label { min-width: 240px; color: var(--body-quiet-color); }
+  .utm-form .form-row input { flex: 1; min-width: 220px; }
+  .utm-form .errorlist { margin: 0 0 .5rem; }
+  .utm-result-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: .75rem; }
+  .utm-result-row input { flex: 1; min-width: 320px; font-family: monospace; }
+  .utm-suggestions { margin-top: .5rem; font-size: .8rem; color: var(--body-quiet-color); }
+</style>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="{% static 'js/utm-builder.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="utm-panel">
+  <h1>Конструктор UTM-ссылок</h1>
+  <p class="muted">
+    Соберите рекламную ссылку с метками: источник попадёт в отчёт
+    «Источники трафика» на панели владельца после оформления заказа.
+  </p>
+
+  <form method="post" class="utm-form">{% csrf_token %}
+    {% for field in form %}
+    <div class="form-row">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+    </div>
+    {% for error in field.errors %}<ul class="errorlist"><li>{{ error }}</li></ul>{% endfor %}
+    {% endfor %}
+    <datalist id="utm-source-list">
+      {% for s in source_suggestions %}<option value="{{ s }}">{% endfor %}
+    </datalist>
+    <datalist id="utm-medium-list">
+      {% for m in medium_suggestions %}<option value="{{ m }}">{% endfor %}
+    </datalist>
+    <div class="submit-row">
+      <button type="submit" class="button">Собрать ссылку</button>
+    </div>
+  </form>
+
+  {% if result %}
+  <h2>Готовая ссылка</h2>
+  <div class="utm-result-row">
+    <input type="text" id="utm-result" value="{{ result }}" readonly>
+    <button type="button" class="button" id="copy-utm">Копировать</button>
+    <a href="{{ result }}" target="_blank" rel="noopener">Открыть в новой вкладке</a>
+  </div>
+  <p class="utm-suggestions">
+    Метки передаются в сессии и записываются в заказ при оформлении —
+    ссылку можно использовать повторно в той же кампании.
+  </p>
+  {% endif %}
+
+  <p><a href="{% url 'owner-dashboard' %}">← Панель владельца</a></p>
+</div>
+{% endblock %}

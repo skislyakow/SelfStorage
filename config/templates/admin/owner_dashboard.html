@@ -29,6 +29,7 @@
     {% csrf_token %}
     <button type="submit" class="button default">Разослать уведомления сейчас</button>
   </form>
+  <p class="mb-3"><a href="{% url 'utm-builder' %}" class="button default">Конструктор UTM-ссылок</a></p>
 
   <div class="owner-cards">
     <div class="owner-card">Доставок к выполнению<b>{{ deliveries_count }}</b></div>
