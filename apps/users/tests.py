@@ -1,10 +1,21 @@
 import re
+import tempfile
+from io import BytesIO
 
 from django.core import mail
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
+from PIL import Image
 
 from apps.users.models import User
+
+
+def png_bytes():
+    buf = BytesIO()
+    Image.new("RGB", (8, 8), "red").save(buf, "PNG")
+    return buf.getvalue()
 
 
 class RegistrationTests(TestCase):
@@ -185,3 +196,92 @@ class PasswordResetTests(TestCase):
 
         user = User.objects.get(email="reset@test.ru")
         self.assertTrue(user.check_password("NewStr0ng!456"))
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp(prefix="selfstorage-tests-"))
+class ProfileTests(TestCase):
+    def setUp(self):
+        self.client = Client(SERVER_NAME="localhost")
+        self.user = User.objects.create_user(
+            email="profile@test.ru", password="Str0ngPass!123", first_name="Пётр"
+        )
+        self.client.force_login(self.user)
+
+    @staticmethod
+    def profile_data(**overrides):
+        data = {
+            "first_name": "Пётр",
+            "email": "profile@test.ru",
+            "phone": "+79990001122",
+        }
+        data.update(overrides)
+        return data
+
+    def test_profile_requires_login(self):
+        self.client.logout()
+        response = self.client.post(reverse("users:profile"), self.profile_data())
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("users:login"), response["Location"])
+
+    def test_profile_get_not_allowed(self):
+        response = self.client.get(reverse("users:profile"))
+        self.assertEqual(response.status_code, 405)
+
+    def test_profile_updates_first_name(self):
+        response = self.client.post(
+            reverse("users:profile"),
+            self.profile_data(first_name="Сергей"),
+            follow=True,
+        )
+        self.assertContains(response, "Профиль сохранён")
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.first_name, "Сергей")
+
+    def test_profile_invalid_email_keeps_old_value(self):
+        response = self.client.post(
+            reverse("users:profile"), self.profile_data(email="не-почта"), follow=True
+        )
+        self.assertContains(response, "Email:")
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, "profile@test.ru")
+
+    def test_profile_uploads_avatar(self):
+        avatar = SimpleUploadedFile("avatar.png", png_bytes(), content_type="image/png")
+        self.client.post(reverse("users:profile"), self.profile_data(avatar=avatar))
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.avatar.name.startswith("avatars/"))
+        self.assertTrue(self.user.avatar.storage.exists(self.user.avatar.name))
+
+    def test_profile_rejects_oversized_avatar(self):
+        big = png_bytes() + b"\x00" * (2 * 1024 * 1024 + 1)
+        avatar = SimpleUploadedFile("big.png", big, content_type="image/png")
+        response = self.client.post(
+            reverse("users:profile"), self.profile_data(avatar=avatar), follow=True
+        )
+        self.assertContains(response, "не больше 2 МБ")
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.avatar, "")
+
+    def test_profile_rejects_non_image_avatar(self):
+        avatar = SimpleUploadedFile("doc.txt", b"hello", content_type="text/plain")
+        response = self.client.post(
+            reverse("users:profile"), self.profile_data(avatar=avatar), follow=True
+        )
+        self.assertContains(response, "Аватар:")
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.avatar, "")
+
+    def test_header_shows_avatar_when_set(self):
+        self.user.avatar.save("a.png", ContentFile(png_bytes()), save=True)
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, "media/avatars/")
+
+    def test_header_shows_placeholder_without_avatar(self):
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, "bi-person")
+        self.assertNotContains(response, "media/avatars/")
+
+    def test_cabinet_form_posts_to_profile(self):
+        response = self.client.get(reverse("my_rent"))
+        self.assertContains(response, f'action="{reverse("users:profile")}"')
+        self.assertContains(response, 'enctype="multipart/form-data"')

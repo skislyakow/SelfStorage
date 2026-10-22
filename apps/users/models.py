@@ -32,6 +32,7 @@ class User(AbstractUser):
     username = None  # type: ignore[assignment]
     email = models.EmailField("Email", unique=True)
     phone = models.CharField("Телефон", max_length=20, blank=True, default="")
+    avatar = models.ImageField("Аватар", upload_to="avatars/", blank=True)
     pd_consent = models.BooleanField("Согласие на обработку ПД", default=False)
 
     objects: ClassVar[UserManager] = UserManager()  # type: ignore[assignment,misc]
