@@ -17,26 +17,39 @@
 	<div class="col-lg-9">
 		<div class="card tab-content p-5">
 			<div class="tab-pane fade show active" id="LK" role="tabpanel" aria-labelledby="LK-tab">
-				<div class="row">
-					<div class="col-12 col-sm-5 d-flex flex-column align-items-center">
-						<img src="{% static 'img/image10.png' %}" class="rounded-pill mb-3" alt="">
-						<h4>{{ user.first_name|default:"Пользователь" }}</h4>
-					</div>
-					<div class="col-12 col-sm-7 d-flex flex-column">
-						<form method="post" action="#">
-							{% csrf_token %}
+				{% if messages %}
+				{% for message in messages %}
+				<div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} py-3 fs_24" role="alert">{{ message }}</div>
+				{% endfor %}
+				{% endif %}
+				<form method="post" action="{% url 'users:profile' %}" enctype="multipart/form-data">
+					{% csrf_token %}
+					<div class="row">
+						<div class="col-12 col-sm-5 d-flex flex-column align-items-center">
+							{% if user.avatar %}
+							<img src="{{ user.avatar.url }}" alt="" class="rounded-pill mb-3" style="width: 180px; height: 180px; object-fit: cover;">
+							{% else %}
+							<img src="{% static 'img/image10.png' %}" alt="" class="rounded-pill mb-3" style="width: 180px; height: 180px; object-fit: cover;">
+							{% endif %}
+							<h4>{{ user.first_name|default:"Пользователь" }}</h4>
+							<label class="btn SelfStorage_orange ps-1 mt-2" for="id_avatar">Загрузить фото</label>
+							<input type="file" name="avatar" id="id_avatar" accept="image/*" class="d-none">
+						</div>
+						<div class="col-12 col-sm-7 d-flex flex-column">
+							<label class="fs_24 SelfStorage_green ms-2" for="FIRST_NAME">Имя</label>
+							<input type="text" name="first_name" id="FIRST_NAME" class="form-control fs_24 ps-2 SelfStorage__input" value="{{ user.first_name }}">
 							<label class="fs_24 SelfStorage_green ms-2" for="EMAIL">E-mail</label>
-							<input type="email" name="email" id="EMAIL" class="form-control fs_24 ps-2 SelfStorage__input" value="{{ user.email }}" disabled>
+							<input type="email" name="email" id="EMAIL" class="form-control fs_24 ps-2 SelfStorage__input" value="{{ user.email }}" readonly>
 							<label class="fs_24 SelfStorage_green ms-2" for="PHONE">Телефон</label>
-							<input type="tel" name="phone" id="PHONE" class="form-control fs_24 ps-2 SelfStorage__input" value="{{ user.phone }}" disabled>
+							<input type="tel" name="phone" id="PHONE" class="form-control fs_24 ps-2 SelfStorage__input" value="{{ user.phone }}" readonly>
 							<label class="fs_24 SelfStorage_green ms-2" for="PASSWORD">Пароль</label>
 							<input type="password" name="password" id="PASSWORD" class="form-control fs_24 ps-2 SelfStorage__input" value="••••••••" disabled>
-							<button type="submit" class="btn SelfStorage_green ps-1" id="save" style="display: none">Сохранить</button>
+							<button type="submit" class="btn SelfStorage_green ps-1" id="save">Сохранить</button>
 							<a class="btn SelfStorage_orange ps-1" id="edit">Редактировать</a>
 							<script src="{% static 'js/profile-edit.js' %}"></script>
-						</form>
+						</div>
 					</div>
-				</div>
+				</form>
 			</div>
 			<div class="tab-pane fade" id="Rent" role="tabpanel" aria-labelledby="Rent-tab">
 				<h1 class="fw-bold SelfStorage_green mb-4">Добрый день, {{ user.first_name|default:user.email }}!</h1>

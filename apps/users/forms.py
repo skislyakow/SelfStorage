@@ -79,3 +79,20 @@ class CustomUserChangeForm(UserChangeForm):
             "pd_consent",
             "password",
         )
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ("first_name", "email", "phone", "avatar")
+        labels: ClassVar[dict] = {
+            "first_name": "Имя",
+            "phone": "Телефон",
+            "avatar": "Аватар",
+        }
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get("avatar")
+        if avatar and avatar.size > 2 * 1024 * 1024:
+            raise forms.ValidationError("файл не больше 2 МБ")
+        return avatar
