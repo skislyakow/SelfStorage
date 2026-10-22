@@ -1,7 +1,11 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Min, Q
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.warehouses.models import Box, Warehouse
+
+from .forms import ReviewForm
 
 
 def warehouse_list(request):
@@ -48,3 +52,21 @@ def warehouse_detail(request, pk):
         "warehouses/warehouse_detail.html",
         {"warehouse": warehouse, "boxes": boxes, "filters": filters},
     )
+
+
+@login_required
+def review_create(request):
+    if request.method == "POST":
+        form = ReviewForm(request.POST, request.FILES)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.author_name = request.user.first_name or request.user.email
+            review.is_published = False
+            review.save()
+            messages.success(
+                request, "Спасибо! Отзыв появится на сайте после проверки."
+            )
+            return redirect("home")
+    else:
+        form = ReviewForm()
+    return render(request, "warehouses/review_form.html", {"form": form})

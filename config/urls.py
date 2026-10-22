@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from apps.warehouses.views import review_create
 from config import views
 from config.admin_dashboard import owner_dashboard, send_notifications_now
 
@@ -13,6 +14,7 @@ urlpatterns = [
     ),
     path("admin/", admin.site.urls),
     path("", views.HomeView.as_view(), name="home"),
+    path("reviews/create/", review_create, name="review_create"),
     path("faq/", views.FaqView.as_view(), name="faq"),
     path("storage-rules/", views.StorageRulesView.as_view(), name="storage_rules"),
     path("privacy/", views.PrivacyView.as_view(), name="privacy"),

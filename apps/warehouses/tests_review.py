@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.urls import reverse
 
 from apps.warehouses.models import Review
 
@@ -100,3 +101,49 @@ class SeedReviewsTests(TestCase):
         Command().handle()
         Command().handle()
         self.assertEqual(Review.objects.count(), 3)
+
+
+class ReviewCreateTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(
+            email="rev@test.ru", first_name="Пётр", is_active=True
+        )
+
+    @staticmethod
+    def form_data(**overrides):
+        data = {
+            "title": "Отличный склад",
+            "text": "Всё понравилось, спасибо.",
+            "city": "Москва",
+        }
+        data.update(overrides)
+        return data
+
+    def test_review_create_requires_login(self):
+        response = self.client.get(reverse("review_create"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("users:login"), response["Location"])
+
+    def test_review_goes_to_moderation(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("review_create"), self.form_data(), follow=True
+        )
+        self.assertContains(response, "Спасибо")
+        review = Review.objects.get()
+        self.assertFalse(review.is_published)
+        self.assertEqual(review.author_name, "Пётр")
+        home = self.client.get(reverse("home"))
+        self.assertNotContains(home, "Отличный склад")
+
+    def test_form_requires_title_and_text(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse("review_create"), {})
+        self.assertEqual(Review.objects.count(), 0)
+        errors = response.context["form"].errors
+        self.assertIn("title", errors)
+        self.assertIn("text", errors)
+
+    def test_home_has_review_button(self):
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, reverse("review_create"))
