@@ -81,6 +81,16 @@ class UtmBuilderTests(TestCase):
         self.assertIsNone(resp.context["result"])
         self.assertIn("custom_path", resp.context["form"].errors)
 
+    def test_wizard_target_points_to_real_wizard_url(self):
+        self.client.force_login(self.staff)
+        resp = self.client.post(
+            "/admin/utm-builder/",
+            {"target": "/orders/wizard/", "source": "yandex"},
+        )
+        self.assertEqual(
+            resp.context["result"], "http://testserver/orders/wizard/?utm_source=yandex"
+        )
+
     def test_omitted_optional_params_not_in_url(self):
         self.client.force_login(self.staff)
         resp = self.client.post(

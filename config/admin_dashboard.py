@@ -20,7 +20,7 @@ DELIVERY_ACTIVE_STATUSES = ("new", "in_progress")
 TARGET_CHOICES = (
     ("/", "Главная"),
     ("/warehouses/", "Каталог складов"),
-    ("/rentals/wizard/", "Оформление аренды (визард)"),
+    ("/orders/wizard/", "Оформление аренды (визард)"),
     ("custom", "Своя страница"),
 )
 SOURCE_SUGGESTIONS = (
