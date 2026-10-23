@@ -22,6 +22,8 @@ class AdminThemeTemplateTests(SimpleTestCase):
     def test_base_site_declares_branding(self):
         self.assertIn("block branding", BASE_SITE)
         self.assertIn("admin-logo", BASE_SITE)
+        self.assertIn('alt="SelfStorage"', BASE_SITE)
+        self.assertNotIn('admin-logo">SelfStorage', BASE_SITE)
 
 
 class AdminThemeCssTests(SimpleTestCase):
