@@ -118,7 +118,7 @@ def owner_dashboard(request, *args, **kwargs):
     for row in raw_sources:
         source = row["traffic_source"] or "(без метки)"
         campaign = row["traffic_campaign"] or "(без кампании)"
-        revenue = row["revenue"] or 0
+        revenue = round(row["revenue"] or 0, 2)
         traffic_sources.append(
             {
                 "source": source,
