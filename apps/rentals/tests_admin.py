@@ -89,6 +89,17 @@ class OwnerDashboardTests(TestCase):
         self.assertContains(resp, "lyto")
         self.assertContains(resp, "(без кампании)")
 
+    def test_dashboard_revenues_have_no_float_noise(self):
+        admin = User.objects.get(email="admin@selfstorage.ru")
+        self.client.force_login(admin)
+        resp = self.client.get("/admin/owner-dashboard/")
+        sources = resp.context["traffic_sources"]
+        self.assertTrue(sources)
+        for row in sources:
+            self.assertRegex(str(row["revenue"]), r"^\d+(\.\d{1,2})?$")
+        total = resp.context["traffic_total"]["revenue"]
+        self.assertRegex(str(total), r"^\d+(\.\d{1,2})?$")
+
     def test_delivery_add_requires_order(self):
         admin = User.objects.get(email="admin@selfstorage.ru")
         self.client.force_login(admin)
