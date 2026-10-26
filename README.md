@@ -42,34 +42,6 @@
 
 ## Стек технологий
 
-| Слой | Технологии |
-|---|---|
-| Backend | Python 3.12, Django 5.2.17 — кастомная модель пользователя, class-based views, ORM и миграции, Django Admin, signals, middleware, management-команды |
-| Данные | SQLite (осознанный выбор для демо-стенда: база — один файл, отдельный сервер БД не нужен) |
-| Фронтенд | Django Templates, Bootstrap 5.0.2, собственный CSS, vanilla JS |
-| Оформление заказа | django-formtools (`SessionWizardView`), валидация через Django Forms |
-| Платежи | API ЮKassa: создание платежа, `return_url`, webhook |
-| Почта и уведомления | Django email backend, SMTP REG.RU, management-команда `send_notifications`, systemd timer |
-| QR-доступ | `qrcode` + Pillow |
-| Конфигурация | django-environ, 12-факторный `.env` (шаблон — `.env.example`) |
-| Продакшен | nginx 1.24 + gunicorn под systemd на VPS (Ubuntu); приложение и таймер уведомлений — отдельные юниты |
-| CI/CD | GitHub Actions: CI (lint, типы, тесты, проверка миграций) и деплой на сервер по SSH |
-| Качество кода | uv (зависимости и Python), ruff (lint и формат), mypy + django-stubs, pre-commit, Django TestCase |
-
-## Скриншоты
-
-![Главная страница](docs/img/home.webp)
-
-![Склады и боксы](docs/img/warehouses.webp)
-
-![Правила хранения](docs/img/storage_rules.webp)
-
-![Вход](docs/img/login.webp)
-
-![Панель владельца — дашборд заказов, выручки, заявок на доставку и источников трафика](docs/img/owner_dashboard.webp)
-
-![Конструктор UTM-ссылок в админке](docs/img/utm_builder.webp)
-
 ## Как запустить
 
 ```powershell
@@ -91,6 +63,20 @@ uv run python manage.py seed_demo
 # 6. Запускаем сервер
 uv run python manage.py runserver
 ```
+
+## Скриншоты
+
+![Главная страница](docs/img/home.webp)
+
+![Склады и боксы](docs/img/warehouses.webp)
+
+![Правила хранения](docs/img/storage_rules.webp)
+
+![Вход](docs/img/login.webp)
+
+![Панель владельца — дашборд заказов, выручки, заявок на доставку и источников трафика](docs/img/owner_dashboard.webp)
+
+![Конструктор UTM-ссылок в админке](docs/img/utm_builder.webp)
 
 ## Демо-доступы
 
@@ -120,17 +106,9 @@ uv run pre-commit run --all-files
 
 ## Структура проекта
 
-```
-apps/        Django-приложения: users, warehouses, rentals, promotions, payments, notifications
-config/      настройки, роутинг, базовые шаблоны, дашборд владельца и конструктор UTM-ссылок
-docs/        деплой, UTM-метки, QR-доступ, уведомления
-scripts/     bootstrap окружения (PowerShell и sh)
-static/      исходные CSS и изображения
-deploy.sh    шаги деплоя на сервере
-```
-
 ## Документация
 
+- [docs/architecture.md](docs/architecture.md) — стек технологий и структура проекта
 - [docs/TODO.md](docs/TODO.md) — открытые задачи проекта (что осталось сделать)
 - [CONVENTIONS.md](CONVENTIONS.md) — договорённости проекта (URL, сигналы, переменные шаблонов)
 - [AGENTS.md](AGENTS.md) — окружение, команды и правила работы агентов в этом репозитории
